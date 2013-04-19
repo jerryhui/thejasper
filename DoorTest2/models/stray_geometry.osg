@@ -1,0 +1,134 @@
+Group {
+  UniqueID Group_0
+  DataVariance STATIC
+  nodeMask 0xffffffff
+  cullingActive TRUE
+  StateSet {
+    rendering_hint DEFAULT_BIN
+    renderBinMode INHERIT
+    GL_NORMALIZE ON
+  }
+  num_children 1
+  Group {
+    name "T:\\ds501\\Projects\\hauntedhotel\\thejasper\\DoorTest2\\models\\stray_geometry.osg-export.dae"
+    nodeMask 0xffffffff
+    cullingActive TRUE
+    num_children 1
+    Geode {
+      name "ID2"
+      nodeMask 0xffffffff
+      cullingActive TRUE
+      num_drawables 2
+      Geometry {
+        DataVariance STATIC
+        name "Material2"
+        StateSet {
+          DataVariance STATIC
+          rendering_hint DEFAULT_BIN
+          renderBinMode INHERIT
+          GL_CULL_FACE ON
+          Material {
+            ColorMode OFF
+            ambientColor 0.2 0.2 0.2 1
+            diffuseColor 1 1 1 1
+            specularColor 0 0 0 1
+            emissionColor 0 0 0 1
+            shininess 0
+          }
+        }
+        useDisplayList TRUE
+        useVertexBufferObjects FALSE
+        PrimitiveSets 1
+        {
+          DrawArrayLengths TRIANGLES 0 1
+          {
+            6 
+          }
+        }
+        VertexArray Vec3Array 8
+        {
+          0 0 0
+          -5.1816 -5.1816 0
+          -5.1816 0 0
+          0 -5.1816 0
+          0 -5.1816 0
+          0 0 0
+          -5.1816 -5.1816 0
+          -5.1816 0 0
+        }
+        VertexIndices UniqueID IntArray_1 IntArray 6
+        {
+          0 1 2 1 0 3 
+        }
+        NormalBinding PER_VERTEX
+        NormalArray Vec3Array 8
+        {
+          0 0 -1
+          0 0 -1
+          0 0 -1
+          0 0 -1
+          0 0 1
+          0 0 1
+          0 0 1
+          0 0 1
+        }
+        NormalIndices Use IntArray_1
+      }
+      Geometry {
+        DataVariance STATIC
+        name "Material3"
+        StateSet {
+          DataVariance STATIC
+          rendering_hint DEFAULT_BIN
+          renderBinMode INHERIT
+          GL_CULL_FACE ON
+          Material {
+            ColorMode OFF
+            ambientColor 0.2 0.2 0.2 1
+            diffuseColor 0.6 0.741176 0.564706 1
+            specularColor 0 0 0 1
+            emissionColor 0 0 0 1
+            shininess 0
+          }
+        }
+        useDisplayList TRUE
+        useVertexBufferObjects FALSE
+        PrimitiveSets 1
+        {
+          DrawArrayLengths TRIANGLES 0 1
+          {
+            6 
+          }
+        }
+        VertexArray Vec3Array 8
+        {
+          0 0 0
+          -5.1816 -5.1816 0
+          -5.1816 0 0
+          0 -5.1816 0
+          0 -5.1816 0
+          0 0 0
+          -5.1816 -5.1816 0
+          -5.1816 0 0
+        }
+        VertexIndices UniqueID IntArray_2 IntArray 6
+        {
+          4 5 6 7 6 5 
+        }
+        NormalBinding PER_VERTEX
+        NormalArray Vec3Array 8
+        {
+          0 0 -1
+          0 0 -1
+          0 0 -1
+          0 0 -1
+          0 0 1
+          0 0 1
+          0 0 1
+          0 0 1
+        }
+        NormalIndices Use IntArray_2
+      }
+    }
+  }
+}
