@@ -439,7 +439,7 @@ class GenericObject(VRScript.Core.Behavior):
 		if(self.isFactory and self.parentScene != None):
 			newName = self.name + "_" + str(self.factoryID)
 			newEnt = self.parentScene.create_entity(newName, self.meshName, [self.vStartPos.x, self.vStartPos.y, self.vStartPos.z], True, True, self.physShape, True, "Static")
-			self.parentScene.set_physics_properties(newName, [1.0, 0.25, 0.9, 1, 0.5])
+			self.parentScene.set_physics_properties(newName, [1.0, 0.75, 0.9, 1, 0.3])
 			self.SetFactory(False)
 			newEnt.SetFactory(True)
 			newEnt.SetParentScene(self.parentScene)
@@ -447,14 +447,14 @@ class GenericObject(VRScript.Core.Behavior):
 			
 			if(self.name.find('purple') != -1):
 				newPlaceholderName = "placeholder_purple_"+newName
-				newPlaceholder = self.parentScene.create_entity(newPlaceholderName, "models\\placeholder_purple_right.ive", [-9.24425168232305,-3.80668043305094,0.341800719102794], False, True, "Box", False, "Static")
-				self.parentScene.set_physics_properties(newPlaceholderName, [1.0, 0.25, 0.9, 1, 0.5])
+				newPlaceholder = self.parentScene.create_entity(newPlaceholderName, "models\\placeholder_card_purple.ive", [-4.07885174682818,-1.66351347923956,0.237764350522633], False, True, "Box", False, "Static")
+				self.parentScene.set_physics_properties(newPlaceholderName, [1.0, 0.75, 0.9, 1, 0.3])
 				newPlaceholder.SetParent(newName)
 				newPlaceholder.OnInit(None)
 			else:
 				newPlaceholderName = "placeholder_red_"+newName
-				newPlaceholder = self.parentScene.create_entity(newPlaceholderName, "models\\placeholder_red_right.ive", [-9.2223533848255,-3.51940847947684,0.200355804312182], False, True, "Box", False, "Static")
-				self.parentScene.set_physics_properties(newPlaceholderName, [1.0, 0.25, 0.9, 1, 0.5])
+				newPlaceholder = self.parentScene.create_entity(newPlaceholderName, "models\\placeholder_card_red.ive", [-3.78730036743045,-1.68747647417187,0.246972251112134], False, True, "Box", False, "Static")
+				self.parentScene.set_physics_properties(newPlaceholderName, [1.0, 0.75, 0.9, 1, 0.3])
 				newPlaceholder.SetParent(newName)
 				newPlaceholder.OnInit(None)
 				
@@ -675,6 +675,7 @@ class GenericObject(VRScript.Core.Behavior):
 			
 		if(self.bPhys == True):
 			if(self.physType != "Kinematic"):
+				print("setting dynamic")
 				self.physical(self.name).setCollisionType(VRScript.Core.CollisionType.Dynamic)
 		
 		if(self.isCard):
@@ -696,10 +697,10 @@ class GenericObject(VRScript.Core.Behavior):
 					if(ctInfo.distance < .3):
 						print("close to bin")
 						self.cardParent = ctInfo.otherEntity.getName()	#this grabs the parent bin name
-						ent = self.parentScene.find_object(ctInfo.otherEntity.getName())
+						ent = self.parentScene.find_object(self.cardParent)
 						if(ent.placeholderName != None):
 							print("placeholder: " + ent.placeholderName)
-						self.initialPose = VRScript.Core.Entity(ent.placeholderName).movable().selfToEntity(self.cardParent)#getPose()
+							self.initialPose = VRScript.Core.Entity(ent.placeholderName).movable().selfToEntity(self.cardParent)
 			else:
 				if(self.cardParent == ctInfo.otherEntity.getName()):
 					if(ctInfo.distance > .3):	#if proximity to the previously attached object is farther
@@ -988,7 +989,7 @@ class WandObject(VRScript.Core.Behavior):
 		phys = VRScript.Core.Physical(self.name, VRScript.Resources.BoundingBox(customWandMesh.getMesh()))
 		phys.setPhysicsProperties(VRScript.Core.PhysicsProperties(15, 0.4, 0.3, 0.3, 0.5))
 		phys.setCollisionType(VRScript.Core.CollisionType.Kinematic)
-		phys.enableDebugVisual(True)
+		phys.enableDebugVisual(False)
 		wand.attach(phys)
 		
 	def OnUpdate(self, cbInfo):
