@@ -18,7 +18,7 @@ class Door(lel_common.GenericObject):
 	def OnInit(self, cbInfo):
 		lel_common.GenericObject.OnInit(self, cbInfo)
 		self.physical('').setConstraints( VRScript.Math.Vector(1,1,0), VRScript.Math.Vector(1,1,1) )
-		self.attach(VRScript.Resources.Collider(self.name, VRScript.Resources.Sphere(2)))
+		# self.attach(VRScript.Resources.Collider(self.name, VRScript.Resources.Sphere(2)))
 		
 	def Rotate(self,x,y,z):
 		# Rotates this door at the given degree.

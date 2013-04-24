@@ -27,9 +27,8 @@ class Paranormal(lel_common.GenericObject):
 	#		name - Name of paranormal (for display)
 	#		location - Location within model (use VRScript's format)
 	#		discoverCommand - voice command to discover this paranormal
-	def __init__(self, name, location, discoverCommand, initState=ParanormalState.Hiding):
-		self.name = name
-		self.location = location
+	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding):
+		lel_common.GenericObject.__init__(self, name, sMeshName, location, True, True, "Concave", True, "Static")
 		self.state = initState
 		self.discoverCommand = discoverCommand
 		self.type = "paranormal"
@@ -38,6 +37,7 @@ class Paranormal(lel_common.GenericObject):
 		self.animObj = None
 		self.discoveredAnimPlaymode = VRScript.Core.PlayMode.Loop
 		self.capturedAnimPlaymode = VRScript.Core.PlayMode.Once
+		print(self + " initialized. Current state=" + self.state)
 	
 	# Converts this Paranormal to a string.
 	def __str__(self):
@@ -73,7 +73,7 @@ class Paranormal(lel_common.GenericObject):
 
 	# Runs visual feedback of successful discovery.
 	def DiscoveredAnimation(self):
-		print "You have discovered ", self, "!\n"
+		print("You have discovered "+self+"!\n")
 		
 	# Sets the animation file to play when this paranormal is captured.
 	# Set this to null if a programmatic animation is to be used; implement CapturedAnimation()
@@ -102,12 +102,16 @@ class Paranormal(lel_common.GenericObject):
 				
 	# Runs visual feedback of successful capture.
 	def CapturedAnimation(self):
-		print "You have captured ", self, "!\n"
+		print("You have captured "+self+"!\n")
+		self.renderable(self.name).hide()
+		self.animObj.renderable('').hide()
 	
 	# Runs visual effect while idle.
 	def IdleAnimation(self):
 		# implement if idle animation via programming is wanted
-		pass
+		m = self.movable().getPose()
+		m.postEuler(.25,0,0)
+		self.movable().setPose(m)
 	
 	# Implements VRScript.Core.Behavior.OnUpdate.
 	def OnUpdate(self, cbInfo):
