@@ -33,6 +33,11 @@ class Paranormal(lel_common.GenericObject):
 		self.state = initState
 		self.discoverCommand = discoverCommand
 		self.type = "paranormal"
+		self.discoveredFBX = ""
+		self.capturedFBX = ""
+		self.animObj = None
+		self.discoveredAnimPlaymode = VRScript.Core.PlayMode.Loop
+		self.capturedAnimPlaymode = VRScript.Core.PlayMode.Once
 	
 	# Converts this Paranormal to a string.
 	def __str__(self):
@@ -42,32 +47,67 @@ class Paranormal(lel_common.GenericObject):
 	def getName(self):
 		return self.name + " the " + self.type
 
+	# Sets the animation file to play when this paranormal is discovered.
+	# Set this to null if a programmatic animation is to be used; implement DiscoveredAnimation()
+	# to provide programmatic animation.
+	# Inputs:
+	#	file - file name of FBX
+	#	mode(OPT) - playback mode; as VRScript.Core.PlayMode
+	def SetDiscoveredAnimation(self, file, mode=VRScript.Core.PlayMode.Loop):
+		self.discoveredFBX = file
+		self.discoveredAnimPlaymode = mode
+
 	# Discovers this paranormal. Note that the interactive method that calls this function
 	# will have to perform validation on whether the interaction was correct.
 	def Discover(self):
 		if (self.state == ParanormalState.Hiding):
 			self.state = ParanormalState.Discovered
-			self.DiscoveredAnimation()
+			if (self.discoveredFBX == ""):
+				self.DiscoveredAnimation()
+			else:
+				self.renderable(self.name).hide()
+				self.animObj = Animation.AnimationObject(self.name + "_discovered")
+				self.animObj.LoadAnimation(self.discoveredFBX)
+				self.animObj.SetPosition(self.movable().getPose())
+				self.animObj.Play(self.discoveredAnimPlaymode)
 
 	# Runs visual feedback of successful discovery.
 	def DiscoveredAnimation(self):
 		print "You have discovered ", self, "!\n"
 		
+	# Sets the animation file to play when this paranormal is captured.
+	# Set this to null if a programmatic animation is to be used; implement CapturedAnimation()
+	# to provide programmatic animation.
+	# Inputs:
+	#	file - file name of FBX
+	#	mode(OPT) - playback mode; as VRScript.Core.PlayMode
+	def SetCapturedAnimation(self, file, mode=VRScript.Core.PlayMode.Once):
+		self.capturedFBX = file
+		self.capturedAnimPlaymode = mode
 
 	# Captures this Paranormal. Note that the interactive method that calls this function
 	# will have to perform validation on whether the interaction was correct.
 	def Capture(self):
 		if (self.state == Paranormal.Discovered):
 			self.state = ParanormalState.Captured
-			self.CaptureAnimation()
-		
+			self.CapturedAnimation()
+		if (self.capturedFBX == ""):
+			self.CapturedAnimation()
+		else:
+			self.renderable(self.name).hide()
+			self.animObj = Animation.AnimationObject(self.name + "_captured")
+			self.animObj.LoadAnimation(self.capturedFBX)
+			self.animObj.SetPosition(self.movable().getPose())
+			self.animObj.Play(self.capturedAnimPlaymode)
+				
 	# Runs visual feedback of successful capture.
-	def CaptureAnimation(self):
+	def CapturedAnimation(self):
 		print "You have captured ", self, "!\n"
 	
 	# Runs visual effect while idle.
 	def IdleAnimation(self):
 		# implement if idle animation via programming is wanted
+		pass
 	
 	# Implements VRScript.Core.Behavior.OnUpdate.
 	def OnUpdate(self, cbInfo):
