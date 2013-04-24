@@ -35,7 +35,7 @@ class AnimationObject(VRScript.Core.Behavior):
 	# Input:
 	#		VRScript.Math.Matrix m - destination pose matrix
 	def SetPosition(self, m):
-		set.movable().setPose(m)
+		self.movable().setPose(m)
 	
 	# Play the animation.
 	#	Inputs:
