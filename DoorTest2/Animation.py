@@ -3,9 +3,9 @@ import VRScript
 # Represents an animation that can be played.
 class AnimationObject(VRScript.Core.Behavior):
 	# class AnimationObject(VRScript.Core.Behavior):
-	# 	def __init__(self, entity=None):
-	# 		VRScript.Core.Behavior.__init__(self,entity)
-	# 		self.name = "Animation"
+	def __init__(self, name):
+		VRScript.Core.Behavior.__init__(self,name)
+	
 	# 
 	# 	def OnInit(self, info):
 	# 		self.attach(VRScript.Core.Interactible(self.name, self.renderable('')))
