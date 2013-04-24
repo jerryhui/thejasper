@@ -3,6 +3,13 @@ import lel_common
 
 # A Door instance is a door that will open and close when user approaches, with animation and audio.
 class Door(lel_common.GenericObject):
+	# Constructor.
+	# Inputs:
+	#		sName - name of this object
+	#		sMeshName - OBJ file name
+	#		position - 3-element array containing the initial coordinates of this object
+	#		isOpen - set to True if the object is the model of an open door
+	#		openAngle - the angle to turn in order to OPEN the door
 	def __init__(self, sName, sMeshName, position, isOpen, openAngle):
 		lel_common.GenericObject.__init__(self, sName, sMeshName, position, True, True, "Concave", True, "Static")
 		self.isOpen = isOpen
@@ -34,8 +41,9 @@ class Door(lel_common.GenericObject):
 		self.isOpen = False
 	
 	# Toggle this door on left click.
+	# Implements VRScript.Core.Behavior.OnButtonRelease
 	def OnButtonRelease(self, cbInfo, btInfo, user):
-		print("Yo")
+		print("Door" + self.name + " clicked")
 		if (btInfo.button == 0):
 			if (self.isOpen):
 				self.Close()

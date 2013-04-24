@@ -1,3 +1,4 @@
+# A Paranormal
 class Paranormal(object):
 	# Initializes a Paranormal.
 	# Input:
@@ -10,12 +11,13 @@ class Paranormal(object):
 		self.isCaptured = False
 		self.captureCommand = captureCommand
 		self.type = "paranormal"
-		
-	def getName(self):
-		return self.name + " the " + self.type
 	
+	# Converts this Paranormal to a string.
 	def __str__(self):
 		return self.getName()
+
+	def getName(self):
+		return self.name + " the " + self.type
 	
 	# Captures this Paranormal.
 	def capture(self, command):
