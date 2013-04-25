@@ -71,10 +71,6 @@ class Paranormal(lel_common.GenericObject):
 				self.animObj.SetPosition(self.movable().getPose())
 				self.animObj.Play(self.discoveredAnimPlaymode)
 
-	# Runs visual feedback of successful discovery.
-	def DiscoveredAnimation(self):
-		print("You have discovered "+self+"!\n")
-		
 	# Sets the animation file to play when this paranormal is captured.
 	# Set this to null if a programmatic animation is to be used; implement CapturedAnimation()
 	# to provide programmatic animation.
@@ -99,6 +95,21 @@ class Paranormal(lel_common.GenericObject):
 			self.animObj.LoadAnimation(self.capturedFBX)
 			self.animObj.SetPosition(self.movable().getPose())
 			self.animObj.Play(self.capturedAnimPlaymode)
+
+	# Advances the state. 
+	# Returns: True if state was advanced.
+	def AdvanceState(self):
+		if (self.state == ParanormalState.Hiding):
+			self.Discover()
+			return True
+		elif (self.state == ParanormalState.Discovered):
+			self.Capture()
+			return True
+		return False
+
+	# Runs visual feedback of successful discovery.
+	def DiscoveredAnimation(self):
+		print("You have discovered "+self+"!\n")
 				
 	# Runs visual feedback of successful capture.
 	def CapturedAnimation(self):
@@ -109,13 +120,20 @@ class Paranormal(lel_common.GenericObject):
 	# Runs visual effect while idle.
 	def IdleAnimation(self):
 		# implement if idle animation via programming is wanted
-		m = self.movable().getPose()
-		m.postEuler(.25,0,0)
-		self.movable().setPose(m)
+		# m = self.movable().getPose()
+		# m.postEuler(.25,0,0)
+		# self.movable().setPose(m)
 	
 	# Implements VRScript.Core.Behavior.OnUpdate.
 	def OnUpdate(self, cbInfo):
 		self.IdleAnimation()
+		
+	# Implements VRScript.Core.Behavior.OnButtonRelease.
+	# Discovers/catches the paranormal by button click.
+	def OnButtonRelease(self, cbInfo, btnInfo, intInfo):
+		print(self + " is clicked.")
+		if (btInfo.button == 0):
+			self.AdvanceState()
 	
 class Ghost(Paranormal):
 	def __init__(self, name, location, discoverCommand):
