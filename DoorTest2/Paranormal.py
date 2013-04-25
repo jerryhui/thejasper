@@ -119,10 +119,11 @@ class Paranormal(lel_common.GenericObject):
 	
 	# Runs visual effect while idle.
 	def IdleAnimation(self):
+		# pass
 		# implement if idle animation via programming is wanted
-		# m = self.movable().getPose()
-		# m.postEuler(.25,0,0)
-		# self.movable().setPose(m)
+		m = self.movable().getPose()
+		m.postEuler(.25,0,0)
+		self.movable().setPose(m)
 	
 	# Implements VRScript.Core.Behavior.OnUpdate.
 	def OnUpdate(self, cbInfo):
