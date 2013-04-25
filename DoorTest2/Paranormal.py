@@ -47,6 +47,9 @@ class Paranormal(lel_common.GenericObject):
 	def getName(self):
 		return self.name + " the " + self.type
 
+	def IsCaptured(self):
+		return (self.state == ParanormalState.Captured)
+
 	# Sets the animation file to play when this paranormal is discovered.
 	# Set this to null if a programmatic animation is to be used; implement DiscoveredAnimation()
 	# to provide programmatic animation.
