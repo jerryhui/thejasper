@@ -1,6 +1,8 @@
 import VRScript
 import lel_common
 import Animation
+import math
+import time
 
 # Enumerates all possible states of a paranormal. See documentation for Paranormal for more.
 class ParanormalState:
@@ -25,6 +27,7 @@ class Paranormal(lel_common.GenericObject):
 	# Constructor.
 	# Input:
 	#		name - Name of paranormal (for display)
+	#		sMeshName - Name of renderable file (OBJ or FBX)
 	#		location - Location within model (use VRScript's format)
 	#		discoverCommand - voice command to discover this paranormal
 	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding):
@@ -37,7 +40,7 @@ class Paranormal(lel_common.GenericObject):
 		self.animObj = None
 		self.discoveredAnimPlaymode = VRScript.Core.PlayMode.Loop
 		self.capturedAnimPlaymode = VRScript.Core.PlayMode.Once
-		print(self + " initialized. Current state=" + self.state)
+		print(self.name + " initialized. Current state=" + str(self.state))
 	
 	# Converts this Paranormal to a string.
 	def __str__(self):
@@ -59,19 +62,20 @@ class Paranormal(lel_common.GenericObject):
 	def SetDiscoveredAnimation(self, file, mode=VRScript.Core.PlayMode.Loop):
 		self.discoveredFBX = file
 		self.discoveredAnimPlaymode = mode
+		print ("Set discovery anim for " + str(self) + " to " + file)
 
 	# Discovers this paranormal. Note that the interactive method that calls this function
 	# will have to perform validation on whether the interaction was correct.
 	def Discover(self):
 		if (self.state == ParanormalState.Hiding):
 			self.state = ParanormalState.Discovered
-			if (self.discoveredFBX == ""):
+			if (len(self.discoveredFBX)== 0):
 				self.DiscoveredAnimation()
 			else:
 				self.renderable(self.name).hide()
 				self.animObj = Animation.AnimationObject(self.name + "_discovered")
 				self.animObj.LoadAnimation(self.discoveredFBX)
-				self.animObj.SetPosition(self.movable().getPose())
+				# self.animObj.SetPosition(self.movable().getPose())
 				self.animObj.Play(self.discoveredAnimPlaymode)
 
 	# Sets the animation file to play when this paranormal is captured.
@@ -87,10 +91,11 @@ class Paranormal(lel_common.GenericObject):
 	# Captures this Paranormal. Note that the interactive method that calls this function
 	# will have to perform validation on whether the interaction was correct.
 	def Capture(self):
-		if (self.state == Paranormal.Discovered):
+		if (self.state == ParanormalState.Discovered):
 			self.state = ParanormalState.Captured
 			self.CapturedAnimation()
-		if (self.capturedFBX == ""):
+		if (len(self.capturedFBX)==0):
+			print("Use CapturedAnimation()")
 			self.CapturedAnimation()
 		else:
 			self.renderable(self.name).hide()
@@ -112,21 +117,19 @@ class Paranormal(lel_common.GenericObject):
 
 	# Runs visual feedback of successful discovery.
 	def DiscoveredAnimation(self):
-		print("You have discovered "+self+"!\n")
+		print("You have discovered "+str(self)+"!\n")
 				
 	# Runs visual feedback of successful capture.
 	def CapturedAnimation(self):
-		print("You have captured "+self+"!\n")
+		print("You have captured "+str(self)+"!\n")
 		self.renderable(self.name).hide()
-		self.animObj.renderable('').hide()
+		if (self.animObj is not None):
+			self.animObj.renderable('').hide()
 	
 	# Runs visual effect while idle.
 	def IdleAnimation(self):
-		# pass
 		# implement if idle animation via programming is wanted
-		m = self.movable().getPose()
-		m.postEuler(.25,0,0)
-		self.movable().setPose(m)
+		pass
 	
 	# Implements VRScript.Core.Behavior.OnUpdate.
 	def OnUpdate(self, cbInfo):
@@ -135,16 +138,53 @@ class Paranormal(lel_common.GenericObject):
 	# Implements VRScript.Core.Behavior.OnButtonRelease.
 	# Discovers/catches the paranormal by button click.
 	def OnButtonRelease(self, cbInfo, btnInfo, intInfo):
-		print(self + " is clicked.")
-		if (btInfo.button == 0):
+		print(str(self) + " is clicked.")
+		if (btnInfo.button == 0):
 			self.AdvanceState()
 	
 class Ghost(Paranormal):
-	def __init__(self, name, location, discoverCommand):
-		Paranormal.__init__(self, name, location, discoverCommand)
+	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding, hoverDist=0.001, hoverSpeed=0.01):
+		Paranormal.__init__(self, name, sMeshName, location, discoverCommand, initState)
 		self.type = "ghost"
-		
+		self.hover = -1
+		self.hoverDistance = hoverDist
+		self.hoverSpeed = hoverSpeed
+		self.shrinkCount = 0
+		print("New ghost " + name + " created")
+	
+	def Discover(self):
+		Paranormal.Discover(self)
+		self.hover=0	# kicks off hovering
+	
+	def Capture(self):
+		self.shrinkCount=10
+		Paranormal.Capture(self)
+		self.hover=-1	# turns off hovering
+	
+	def CapturedAnimation(self):
+		print("Capture - shrink, shrink count=", self.shrinkCount)
+		if (self.shrinkCount>0):
+			m = self.movable().getPose()
+			# m.postScale(VRScript.Math.Vector(50,50,50))
+			m.postEuler(10,10,10)
+			self.movable().setPose(m)
+			self.shrinkCount -= 1
+			time.sleep(.15)
+			self.CapturedAnimation()
+		else:
+			self.shrinkCount = 0
+			self.renderable(self.name).hide()
+	
+	def IdleAnimation(self):
+		# Hover effect
+		if (self.hover != -1):
+			m = self.movable().getPose()
+			m.preTranslation(VRScript.Math.Vector(0,0,math.sin(self.hover)*self.hoverDistance))
+			self.movable().setPose(m)
+			self.hover += self.hoverSpeed
+			self.hover %= 360	
+	
 class EvilSoup(Paranormal):
-	def __init__(self, name, location, discoverCommand):
-		Paranormal.__init__(self, name, location, discoverCommand)
+	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding):
+		Paranormal.__init__(self, name, sMeshName, location, discoverCommand, initState)
 		self.type = "evil soup"

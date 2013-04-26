@@ -19,8 +19,7 @@ class AnimationObject(VRScript.Core.Behavior):
 	#		preAngle - degree to rotate this animation before showing
 	#		VRScript.Math.Vector preAxis - axis to rotate this animation before showing
 	def LoadAnimation(self, file, preScale=VRScript.Math.Vector(1,1,1), preAngle=0, preAxis=VRScript.Math.Vector(1,0,0)):
-		print("load animation:")
-		print(file)
+		print("load animation: " +file)
 		
 		mat = VRScript.Math.Matrix()
 		mat.preScale(preScale)
@@ -35,12 +34,13 @@ class AnimationObject(VRScript.Core.Behavior):
 	# Input:
 	#		VRScript.Math.Matrix m - destination pose matrix
 	def SetPosition(self, m):
+		print ("set position")
 		self.movable().setPose(m)
 	
 	# Play the animation.
 	#	Inputs:
 	#		VRScript.Core.PlayMode mode - mode of playback
-	def Play(self, mode):
+	def Play(self, mode=VRScript.Core.PlayMode.Once):
 		self.anim = VRScript.Core.AnimationStrip('Take 001', 0.0, 0.0, 0, mode)
 		self.animable('').play(self.anim)
 		
