@@ -35,8 +35,8 @@ class Paranormal(lel_common.GenericObject):
 		self.state = initState
 		self.discoverCommand = discoverCommand
 		self.type = "paranormal"
-		self.discoveredFBX = ""
-		self.capturedFBX = ""
+		self.discoveredFBX = None
+		self.capturedFBX = None
 		self.animObj = None
 		self.discoveredAnimPlaymode = VRScript.Core.PlayMode.Loop
 		self.capturedAnimPlaymode = VRScript.Core.PlayMode.Once
@@ -59,9 +59,8 @@ class Paranormal(lel_common.GenericObject):
 	# Inputs:
 	#	file - file name of FBX
 	#	mode(OPT) - playback mode; as VRScript.Core.PlayMode
-	def SetDiscoveredAnimation(self, file, mode=VRScript.Core.PlayMode.Loop):
-		self.discoveredFBX = file
-		self.discoveredAnimPlaymode = mode
+	def SetDiscoveredAnimation(self, file, mode=VRScript.Core.PlayMode.Loop, preAngles=[0,0,0], preScale=VRScript.Math.Vector(1,1,1)):
+		self.discoveredFBX = Animation.AnimationMeta(self.name + "_discovered", file, mode, preScale, preAngles)
 		print ("Set discovery anim for " + str(self) + " to " + file)
 
 	# Discovers this paranormal. Note that the interactive method that calls this function
@@ -69,13 +68,14 @@ class Paranormal(lel_common.GenericObject):
 	def Discover(self):
 		if (self.state == ParanormalState.Hiding):
 			self.state = ParanormalState.Discovered
-			if (len(self.discoveredFBX)== 0):
+			if (self.discoveredFBX is None):
 				self.DiscoveredAnimation()
 			else:
+				print("Use FBX for " + str(self) + "-discovered")
 				self.renderable(self.name).hide()
 				self.animObj = Animation.AnimationObject(self.name + "_discovered")
-				self.animObj.LoadAnimation(self.discoveredFBX)
-				# self.animObj.SetPosition(self.movable().getPose())
+				self.animObj.LoadAnimMeta(self.discoveredFBX)
+				self.animObj.SetPosition(self.movable().getPose())
 				self.animObj.Play(self.discoveredAnimPlaymode)
 
 	# Sets the animation file to play when this paranormal is captured.
@@ -84,9 +84,8 @@ class Paranormal(lel_common.GenericObject):
 	# Inputs:
 	#	file - file name of FBX
 	#	mode(OPT) - playback mode; as VRScript.Core.PlayMode
-	def SetCapturedAnimation(self, file, mode=VRScript.Core.PlayMode.Once):
-		self.capturedFBX = file
-		self.capturedAnimPlaymode = mode
+	def SetCapturedAnimation(self, file, mode=VRScript.Core.PlayMode.Once, preAngles=[0,0,0], preScale=VRScript.Math.Vector(1,1,1)):
+		self.capturedFBX = Animation.AnimationMeta(self.name + "_discovered", file, mode, preScale, preAngles)
 
 	# Captures this Paranormal. Note that the interactive method that calls this function
 	# will have to perform validation on whether the interaction was correct.
@@ -94,13 +93,14 @@ class Paranormal(lel_common.GenericObject):
 		if (self.state == ParanormalState.Discovered):
 			self.state = ParanormalState.Captured
 			self.CapturedAnimation()
-		if (len(self.capturedFBX)==0):
+		if (self.capturedFBX is None):
 			print("Use CapturedAnimation()")
 			self.CapturedAnimation()
 		else:
 			self.renderable(self.name).hide()
 			self.animObj = Animation.AnimationObject(self.name + "_captured")
-			self.animObj.LoadAnimation(self.capturedFBX)
+			# self.animObj.LoadAnimation(self.capturedFBX)
+			self.animObj.LoadAnimMeta(self.capturedFBX)
 			self.animObj.SetPosition(self.movable().getPose())
 			self.animObj.Play(self.capturedAnimPlaymode)
 
