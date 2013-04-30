@@ -92,6 +92,7 @@ class Paranormal(lel_common.GenericObject):
 	def Capture(self):
 		if (self.state == ParanormalState.Discovered):
 			self.state = ParanormalState.Captured
+			print(str(self) + ' is captured!')
 			self.CapturedAnimation()
 		if (self.capturedFBX is None):
 			print("Use CapturedAnimation()")
@@ -99,7 +100,6 @@ class Paranormal(lel_common.GenericObject):
 		else:
 			self.renderable(self.name).hide()
 			self.animObj = Animation.AnimationObject(self.name + "_captured")
-			# self.animObj.LoadAnimation(self.capturedFBX)
 			self.animObj.LoadAnimMeta(self.capturedFBX)
 			self.animObj.SetPosition(self.movable().getPose())
 			self.animObj.Play(self.capturedAnimPlaymode)
@@ -133,7 +133,10 @@ class Paranormal(lel_common.GenericObject):
 	
 	# Implements VRScript.Core.Behavior.OnUpdate.
 	def OnUpdate(self, cbInfo):
-		self.IdleAnimation()
+		if (self.state == ParanormalState.Discovered):
+			self.IdleAnimation()
+		elif (self.state == ParanormalState.Captured):
+			self.CapturedAnimation()
 		
 	# Implements VRScript.Core.Behavior.OnButtonRelease.
 	# Discovers/catches the paranormal by button click.
@@ -157,23 +160,20 @@ class Ghost(Paranormal):
 		self.hover=0	# kicks off hovering
 	
 	def Capture(self):
-		self.shrinkCount=10
+		self.shrinkCount=20
 		Paranormal.Capture(self)
 		self.hover=-1	# turns off hovering
 	
+	# Shrink the ghost into oblivion!
 	def CapturedAnimation(self):
-		print("Capture - shrink, shrink count=", self.shrinkCount)
 		if (self.shrinkCount>0):
+			print("Capture - shrink, shrink count=", self.shrinkCount)
 			m = self.movable().getPose()
-			# m.postScale(VRScript.Math.Vector(50,50,50))
-			m.postEuler(10,10,10)
+			m.postScale(VRScript.Math.Vector(0.9,0.9,0.9))
 			self.movable().setPose(m)
 			self.shrinkCount -= 1
-			time.sleep(.15)
-			self.CapturedAnimation()
 		else:
-			self.shrinkCount = 0
-			self.renderable(self.name).hide()
+			self.renderable('').hide()
 	
 	def IdleAnimation(self):
 		# Hover effect

@@ -5,27 +5,39 @@ import Paranormal
 
 user = VRScript.Core.Entity('User0')
 
-# Represents score of current game.
+# Represents score of current game, and any other game stats.
 class ScoreObject(VRScript.Core.Behavior):
-	def __init__(self):
+	def __init__(self,house):
 		VRScript.Core.Behavior.__init__(self, "EnvObject")
+		self.paranormalTotal = 0
+		self.paranormalCaught = 0
+		self.house = house
 	
+	# Creates an instance of score object.
 	def OnInit(self,cbInfo):
-		# create score object
-		ft = VRScript.Core.FontText("Score", "0/0")
-		ft.show()
-		self.attach(ft)
-		# r = VRScript.Core.Renderable("Score", ft)
-		# r.show()
-		bowlingball = VRScript.Resources.Sphere(0.25)
-		renderable = VRScript.Core.Renderable(self.getName(), bowlingball)
-		renderable.show()
-		self.attach(renderable)
+		self.scoreText = VRScript.Core.FontText('Score', 'You have caught {0} out of {1} ghosts'.format(self.paranormalCaught,self.paranormalTotal))
+		self.scoreText.setColor(VRScript.Core.Color(1,1,0))
+		self.scoreText.setHeight(.05)
+		self.scoreText.show()
+		self.attach(self.scoreText)
 		
-	def OnUpdate(self,cbInfo):
-		m = user.movable().getPose()
-		m.postTranslation(VRScript.Math.Vector(-4,2,5))
+		self.movable().setParent('User0Head')
+		m = self.movable().getPose()
+		m.preTranslation(VRScript.Math.Vector(0, 1, 0.75))
 		self.movable().setPose(m)
+		
+	def SetTotal(self, n):
+		self.paranormalTotal = n
+		
+	# Sets caught count and updates text.
+	def SetCaught(self, n):
+		self.paranormalCaught = n
+		self.scoreText.setText('You have caught {0} out of {1} ghosts'.format(self.paranormalCaught,self.paranormalTotal))
+		
+	def OnUpdate(self, cbInfo):
+		n = self.house.CapturedParanormalCount()
+		if (n != self.paranormalCaught):
+			self.SetCaught(n)
 
 # Represents the game engine of The Jasper.
 #	Paranormals[] paranormals - list of paranormals in this scene
@@ -36,7 +48,7 @@ class HauntedHouseEngine(lel_common.LELScenario):
 		lel_common.LELScenario.__init__(self)
 		self.paranormals = []
 		self.showScore = True
-		self.env = ScoreObject()
+		self.env = ScoreObject(self)
 		
 	# Add an object to this haunted house.
 	# Inputs:
@@ -52,6 +64,7 @@ class HauntedHouseEngine(lel_common.LELScenario):
 	def AddParanormal(self, p):
 		self.AddObject(p)
 		self.paranormals.append(p)
+		self.env.SetTotal(len(self.paranormals))
 		print("Added paranormal " + str(p) + " to this scene.")
 		return p
 
@@ -84,14 +97,12 @@ class HauntedHouseEngine(lel_common.LELScenario):
 
 theJasper = HauntedHouseEngine()
 
-# secondFloor = theJasper.create_entity("SecondFloor", "models\\Upstairs\\2f.osg", [-5,-14.40669061564667,-6.72643819712604e-018], True, True, "Concave", True, "Static")
-
 doorL = theJasper.AddObject(HouseObjects.Door("DoorLeft", "models\\DoorLeft.osg", [-5.09199479842989,-4.40669061564667,-6.72643819712604e-018], True, -90))
 theJasper.set_physics_properties("DoorLeft", [1.0, 0.25, 0.9, 1, 0.5])
 
 doorR = theJasper.AddObject(HouseObjects.Door("DoorLeft_1", "models\\DoorLeft_1.osg", [-3.40250259842728,-4.42017033590422,-6.54019670039207e-018], True, 90))
 theJasper.set_physics_properties("DoorLeft_1", [1.0, 0.25, 0.9, 1, 0.5])
 
-ghostMan = theJasper.AddParanormal(Paranormal.Ghost("ghostMan", "001-01start.fbx", [0,0,0], "LOOK", ParanormalState.Discovered))
-ghostMan.SetDiscoveredAnimation("001-01start.fbx", VRScript.Core.PlayMode.Loop, [90,0,0], VRScript.Math.Vector(0.01,0.01,0.01))
+ghostMan = theJasper.AddParanormal(Paranormal.Ghost("ghostMan", "models\\ghost-man.osg", [0,0,0], "LOOK"))
+# ghostMan.SetDiscoveredAnimation("001-01start.fbx", VRScript.Core.PlayMode.Loop, [90,0,0], VRScript.Math.Vector(0.01,0.01,0.01))
 # ghostMan.SetCapturedAnimation("jc-001.fbx")
