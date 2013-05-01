@@ -1,27 +1,34 @@
+import VRScript
+import lel_common
+import HouseObjects
+import Paranormal
+
 # The Jasper - A Haunted House for CAVE
 # Modeling: Jerry Chen, Natalie Flunker, Hasti Mirkia
 # Program: Jerry Hui
 #
 # Created for DS501, Spring 2013
 
-import VRScript
+
 User = VRScript.Core.Entity('User0')	# User entity, declared for global reference.
 
-import lel_common
-import HouseObjects
-import Paranormal
 
-# Represents score of current game, and any other game stats.
-class ScoreObject(VRScript.Core.Behavior):
+# Represents game stats and any other information that needs constant updating in CAVE.
+class EnvObject(VRScript.Core.Behavior):
 	def __init__(self,house):
 		VRScript.Core.Behavior.__init__(self, "EnvObject")
-		self.paranormalTotal = 0
-		self.paranormalCaught = 0
-		self.house = house
+		self.paranormalTotal = 0		# total count of paranormals
+		self.paranormalCaptured = 0		# number of captured paranormals
+		self.house = house		# associated lel_scenario object
+		self.bkgMusic = []		# list of background music objects
+		self.bkgMusicFiles = []	# list of music files
+		self.bkgMusicIndex = 0	# points to current background music
+		self.name = "JasperEnvironment"
 	
-	# Creates an instance of score object.
+	# Initializes all stats.
 	def OnInit(self,cbInfo):
-		self.scoreText = VRScript.Core.FontText('Score', 'You have caught {0} out of {1} ghosts'.format(self.paranormalCaught,self.paranormalTotal))
+		# create score text
+		self.scoreText = VRScript.Core.FontText('Score', 'You have caught {0} out of {1} ghosts'.format(self.paranormalCaptured,self.paranormalTotal))
 		self.scoreText.setColor(VRScript.Core.Color(1,1,0))
 		self.scoreText.setHeight(.05)
 		self.scoreText.show()
@@ -32,29 +39,61 @@ class ScoreObject(VRScript.Core.Behavior):
 		m.preTranslation(VRScript.Math.Vector(0, 1, 0.75))
 		self.movable().setPose(m)
 		
+		# sets up background music
+		for i in range(len(self.bkgMusicFiles)):
+			aud = VRScript.Core.Audible("{0}_bkg{1}".format(self.name,i),self.bkgMusicFiles[i])
+			self.bkgMusic.append(aud)
+			self.attach(self.bkgMusic[i])
+		self.bkgMusicIndex = len(self.bkgMusic)-1	# always begin with track 1
+		
+	# Sets the number of total paranormals.
+	# Input:
+	#	n - Total number of paranormals
 	def SetTotal(self, n):
 		self.paranormalTotal = n
 		
 	# Sets caught count and updates text.
-	def SetCaught(self, n):
-		self.paranormalCaught = n
-		self.scoreText.setText('You have caught {0} out of {1} ghosts'.format(self.paranormalCaught,self.paranormalTotal))
-		
+	# Input:
+	#	n - Number of caught paranormals
+	def SetCaptured(self, n):
+		self.paranormalCaptured = n
+		self.scoreText.setText('You have caught {0} out of {1} ghosts'.format(self.paranormalCaptured,self.paranormalTotal))
+	
+	# Add background music.
+	# Inputs:
+	#	file - path to music file
+	def AddMusic(self,file):
+		if (file not in self.bkgMusicFiles):
+			self.bkgMusicFiles.append(file)
+			print("Added {0} to bkgMusic; total music count={1}".format(file, len(self.bkgMusicFiles)))
+		else:
+			print("DEBUG: music {0} not added".format(file))
+	
+	# Updates game stats. Perform rendering update ONLY when there's an actual change.
 	def OnUpdate(self, cbInfo):
+		# check/update score text
 		n = self.house.CapturedParanormalCount()
-		if (n != self.paranormalCaught):
-			self.SetCaught(n)
+		if (n != self.paranormalCaptured):
+			self.SetCaptured(n)
+			
+		# check/play background music
+		aud = self.bkgMusic[self.bkgMusicIndex]
+		if (not aud.isPlaying()):
+			self.bkgMusicIndex = (self.bkgMusicIndex+1) % len(self.bkgMusic)
+			print("Advance bkgMusicIndex to " + str(self.bkgMusicIndex))
+			self.bkgMusic[self.bkgMusicIndex].play()
 
 # Represents the game engine of The Jasper.
 #	Paranormals[] paranormals - list of paranormals in this scene
 #	user - User0 entity
 #	bool showScore - whether to show the score in front of the user
+#	string[] bkgMusic - list of background music files
 class HauntedHouseEngine(lel_common.LELScenario):
 	def __init__(self):
 		lel_common.LELScenario.__init__(self)
 		self.paranormals = []
 		self.showScore = True
-		self.env = ScoreObject(self)
+		self.env = EnvObject(self)
 		
 	# Add an object to this haunted house.
 	# Inputs:
@@ -100,6 +139,16 @@ class HauntedHouseEngine(lel_common.LELScenario):
 	# Displays score in front of user.
 	def ShowScore(self):
 		pass
+	
+	# Add background music.
+	# Inputs:
+	#	file - path to music file
+	def AddMusic(self,file):
+		print("DEBUG: HauntedHouse.AddMusic()")
+		self.env.AddMusic(file)
+
+		
+#------------------------------------------------------------------------------		
 
 theJasper = HauntedHouseEngine()
 
@@ -112,3 +161,6 @@ theJasper.set_physics_properties("DoorLeft_1", [1.0, 0.25, 0.9, 1, 0.5])
 ghostMan = theJasper.AddParanormal(Paranormal.Ghost("ghostMan", "models\\ghost-man.osg", [0,0,0], "LOOK"))
 # ghostMan.SetDiscoveredAnimation("001-01start.fbx", VRScript.Core.PlayMode.Loop, [90,0,0], VRScript.Math.Vector(0.01,0.01,0.01))
 # ghostMan.SetCapturedAnimation("jc-001.fbx")
+
+theJasper.AddMusic("..\\Music\\evilhaa.wav")
+theJasper.AddMusic("..\\Music\\lux.wav")
