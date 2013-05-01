@@ -1,31 +1,51 @@
+# The Jasper - A Haunted House for CAVE
+# Modeling: Jerry Chen, Natalie Flunker, Hasti Mirkia
+# Program: Jerry Hui
+#
+# Created for DS501, Spring 2013
+
 import VRScript
+
+# Represents the user entity, declared as a global reference
+User = VRScript.Core.Entity('User0')
+
 import lel_common
 import HouseObjects
 import Paranormal
 
-user = VRScript.Core.Entity('User0')
-
 # Represents score of current game.
 class ScoreObject(VRScript.Core.Behavior):
-	def __init__(self):
+	def __init__(self,house):
 		VRScript.Core.Behavior.__init__(self, "EnvObject")
+		self.paranormalTotal = 0
+		self.paranormalCaught = 0
+		self.house = house
 	
+	# Creates an instance of score object.
 	def OnInit(self,cbInfo):
-		# create score object
-		ft = VRScript.Core.FontText("Score", "0/0")
-		ft.show()
-		self.attach(ft)
-		# r = VRScript.Core.Renderable("Score", ft)
-		# r.show()
-		bowlingball = VRScript.Resources.Sphere(0.25)
-		renderable = VRScript.Core.Renderable(self.getName(), bowlingball)
-		renderable.show()
-		self.attach(renderable)
+		self.scoreText = VRScript.Core.FontText('Score', 'You have caught {0} out of {1} ghosts'.format(self.paranormalCaught,self.paranormalTotal))
+		self.scoreText.setColor(VRScript.Core.Color(1,1,0))
+		self.scoreText.setHeight(.05)
+		self.scoreText.show()
+		self.attach(self.scoreText)
 		
-	def OnUpdate(self,cbInfo):
-		m = user.movable().getPose()
-		m.postTranslation(VRScript.Math.Vector(-4,2,5))
+		self.movable().setParent('User0Head')
+		m = self.movable().getPose()
+		m.preTranslation(VRScript.Math.Vector(0, 1, 0.75))
 		self.movable().setPose(m)
+		
+	def SetTotal(self, n):
+		self.paranormalTotal = n
+		
+	# Sets caught count and updates text.
+	def SetCaught(self, n):
+		self.paranormalCaught = n
+		self.scoreText.setText('You have caught {0} out of {1} ghosts'.format(self.paranormalCaught,self.paranormalTotal))
+		
+	def OnUpdate(self, cbInfo):
+		n = self.house.CapturedParanormalCount()
+		if (n != self.paranormalCaught):
+			self.SetCaught(n)
 
 # Represents the game engine of The Jasper.
 #	Paranormals[] paranormals - list of paranormals in this scene
@@ -73,10 +93,10 @@ class HauntedHouseEngine(lel_common.LELScenario):
 	#	rotation - 3-d array of rotation [x,y,z]
 	def MoveUser(self,movement,rotation):
 		print("Move user around")
-		m = user.movable().getPose()
+		m = User.movable().getPose()
 		m.postEuler(rotation[1],rotation[2],rotation[3])
 		m.preTranslation(VRScript.Math.Vector(movement[1],movement[2],movement[3]))
-		user.movable().setPose(m)
+		User.movable().setPose(m)
 	
 	# Displays score in front of user.
 	def ShowScore(self):

@@ -1,9 +1,15 @@
+# The Jasper - A Haunted House for CAVE
+# Modeling: Jerry Chen, Natalie Flunker, Hasti Mirkia
+# Program: Jerry Hui
+#
+# Created for DS501, Spring 2013
+
 import VRScript
+User = VRScript.Core.Entity('User0')	# User entity, declared for global reference.
+
 import lel_common
 import HouseObjects
 import Paranormal
-
-user = VRScript.Core.Entity('User0')
 
 # Represents score of current game, and any other game stats.
 class ScoreObject(VRScript.Core.Behavior):
@@ -86,10 +92,10 @@ class HauntedHouseEngine(lel_common.LELScenario):
 	#	rotation - 3-d array of rotation [x,y,z]
 	def MoveUser(self,movement,rotation):
 		print("Move user around")
-		m = user.movable().getPose()
+		m = User.movable().getPose()
 		m.postEuler(rotation[1],rotation[2],rotation[3])
 		m.preTranslation(VRScript.Math.Vector(movement[1],movement[2],movement[3]))
-		user.movable().setPose(m)
+		User.movable().setPose(m)
 	
 	# Displays score in front of user.
 	def ShowScore(self):

@@ -4,3 +4,4 @@ Animations\*
 *.fbx
 *.pyc
 *.wav
+!README.txt
