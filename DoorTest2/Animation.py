@@ -32,6 +32,21 @@ class AudioObj(VRScript.Core.Behavior):
 	def GetAudible(self):
 		return self.audible
 	
+	# Plays this sound, with optional fade in.
+	# Inputs:
+	#	bool fadeIn (OPT) - True is fade in should be used; default = False
+	#	float fadeInStep(OPT) - step to fade in
+	def Play(self,fadeIn=False,fadeInStep=1.1):
+		aud = self.GetAudible()
+		if (aud is None): aud = self.MakeAudible()
+		if (fadeIn):
+			self.FadeIn(fadeInStep)
+		if (not aud.isPlaying()):
+			aud.play()
+	
+	# Sets the gain of playback.
+	# Input:
+	#	float g (OPT) - output gain
 	def SetGain(self,g):
 		aud = self.GetAudible()
 		if (aud is None): return
@@ -39,19 +54,21 @@ class AudioObj(VRScript.Core.Behavior):
 		audioProp.gain = g
 		aud.setAudioProperties(audioProp)
 	
+	# Begins fading in this sound.
+	# Note: Audible must already be playing; best call through Play()
+	# Input:
+	#	step(OPT) - factor to bump up per frame; default = 1.1
 	def FadeIn(self,step=1.1):
 		if (step>1 and step<2):
 			self.fadingDir = step
 		else:
 			self.fadingDir = 1.1
 		self.fadingCur = 0.1
-		aud = self.GetAudible()
-		if (aud is None):
-			aud = self.MakeAudible()
-		if (not aud.isPlaying()):
-			aud.play()
 		print("Begin fade in " + self.name)
-	
+
+	# Begins fading out this sound.
+	# Input:
+	#	step(OPT) - factor to bump down per frame; default = -0.95
 	def FadeOut(self,step=-0.95):
 		if (step<0 and step>-1):
 			self.fadingDir = step

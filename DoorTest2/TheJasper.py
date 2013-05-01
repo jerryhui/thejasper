@@ -87,7 +87,7 @@ class EnvObject(VRScript.Core.Behavior):
 				self.bkgMusicIndex = (self.bkgMusicIndex+1) % len(self.bkgMusic)
 				print("Advance bkgMusicIndex to " + str(self.bkgMusicIndex))
 				# self.bkgMusic[self.bkgMusicIndex].play()
-				self.bkgMusic[self.bkgMusicIndex].FadeIn(1.05)
+				self.bkgMusic[self.bkgMusicIndex].Play(True,1.05)
 
 # Represents the game engine of The Jasper.
 #	Paranormals[] paranormals - list of paranormals in this scene
