@@ -1,5 +1,83 @@
 import VRScript
 
+class AudioObj(VRScript.Core.Behavior):
+	def __init__(self, name, file, loop=False):
+		VRScript.Core.Behavior.__init__(self,name)
+		self.name = name
+		self.file = file
+		self.loop = loop
+		self.audible = None
+		self.fadingDir = 0		# >0: fade in; <0: fade out
+		self.fadingCur = 1
+		
+	def __str__(self):
+		return self.name
+	
+	# Creates a new instance of Audible.
+	# Input:
+	#	namePrefix - a prefix to add in front of this Audible's name
+	# Output:
+	#	VRScript.Core.Audible
+	def MakeAudible(self,namePrefix=""):
+		aud = VRScript.Core.Audible(namePrefix+self.name, self.file)
+		audioProp = aud.getAudioProperties()
+		audioProp.loop = self.loop
+		aud.setAudioProperties(audioProp)
+		self.audible = aud
+		return aud
+	
+	# Returns the current instance of Audible.
+	# Output:
+	#	VRScript.Core.Audible; None if it hasn't been created
+	def GetAudible(self):
+		return self.audible
+	
+	def SetGain(self,g):
+		aud = self.GetAudible()
+		if (aud is None): return
+		audioProp = aud.getAudioProperties()
+		audioProp.gain = g
+		aud.setAudioProperties(audioProp)
+	
+	def FadeIn(self,step=1.1):
+		if (step>1 and step<2):
+			self.fadingDir = step
+		else:
+			self.fadingDir = 1.1
+		self.fadingCur = 0.1
+		aud = self.GetAudible()
+		if (aud is None):
+			aud = self.MakeAudible()
+		if (not aud.isPlaying()):
+			aud.play()
+		print("Begin fade in " + self.name)
+	
+	def FadeOut(self,step=-0.95):
+		if (step<0 and step>-1):
+			self.fadingDir = step
+		else:
+			self.fadingDir = -0.95
+		self.fadingCur = 1
+		print("Begin fade out " + self.name)
+	
+	def OnUpdate(self,cbInfo):
+		if (self.fadingDir < 0):
+			# fade out
+			self.SetGain(self.fadingCur)
+			self.fadingCur *= (self.fadingDir*-1)
+			if (self.fadingCur < 0.01):
+				self.fadingDir = 0
+				self.fadingCur = 1
+				self.GetAudible().stop()
+		elif (self.fadingDir > 0):
+			# fade in
+			self.SetGain(self.fadingCur)
+			self.fadingCur *= self.fadingDir
+			if (self.fadingCur > 0.95):
+				self.fadingDir = 0
+				self.fadingCur = 1
+				self.SetGain(1)
+
 # Represents metadata for an animation that will be loaded later.
 #	name - human readable name for animation
 #	file - path to FBX

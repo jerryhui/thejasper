@@ -2,6 +2,7 @@ import VRScript
 import lel_common
 import HouseObjects
 import Paranormal
+import Animation
 
 # The Jasper - A Haunted House for CAVE
 # Modeling: Jerry Chen, Natalie Flunker, Hasti Mirkia
@@ -41,7 +42,8 @@ class EnvObject(VRScript.Core.Behavior):
 		
 		# sets up background music
 		for i in range(len(self.bkgMusicFiles)):
-			aud = VRScript.Core.Audible("{0}_bkg{1}".format(self.name,i),self.bkgMusicFiles[i])
+			# aud = VRScript.Core.Audible("{0}_bkg{1}".format(self.name,i),self.bkgMusicFiles[i])
+			aud = Animation.AudioObj("{0}_bkg{1}".format(self.name,i),self.bkgMusicFiles[i])
 			self.bkgMusic.append(aud)
 			self.attach(self.bkgMusic[i])
 		self.bkgMusicIndex = len(self.bkgMusic)-1	# always begin with track 1
@@ -76,12 +78,16 @@ class EnvObject(VRScript.Core.Behavior):
 		if (n != self.paranormalCaptured):
 			self.SetCaptured(n)
 			
-		# check/play background music
-		aud = self.bkgMusic[self.bkgMusicIndex]
-		if (not aud.isPlaying()):
-			self.bkgMusicIndex = (self.bkgMusicIndex+1) % len(self.bkgMusic)
-			print("Advance bkgMusicIndex to " + str(self.bkgMusicIndex))
-			self.bkgMusic[self.bkgMusicIndex].play()
+		# check/advance background music
+		if (self.bkgMusicIndex < len(self.bkgMusic)):
+			aud = self.bkgMusic[self.bkgMusicIndex].GetAudible()
+			if (aud is None):
+				aud = self.bkgMusic[self.bkgMusicIndex].MakeAudible()
+			if (not aud.isPlaying()):
+				self.bkgMusicIndex = (self.bkgMusicIndex+1) % len(self.bkgMusic)
+				print("Advance bkgMusicIndex to " + str(self.bkgMusicIndex))
+				# self.bkgMusic[self.bkgMusicIndex].play()
+				self.bkgMusic[self.bkgMusicIndex].FadeIn(1.05)
 
 # Represents the game engine of The Jasper.
 #	Paranormals[] paranormals - list of paranormals in this scene
@@ -159,8 +165,8 @@ doorR = theJasper.AddObject(HouseObjects.Door("DoorLeft_1", "models\\DoorLeft_1.
 theJasper.set_physics_properties("DoorLeft_1", [1.0, 0.25, 0.9, 1, 0.5])
 
 ghostMan = theJasper.AddParanormal(Paranormal.Ghost("ghostMan", "models\\ghost-man.osg", [0,0,0], "LOOK"))
+ghostMan.SetDiscoveredSound("..\\Music\\moan.wav",True)
 # ghostMan.SetDiscoveredAnimation("001-01start.fbx", VRScript.Core.PlayMode.Loop, [90,0,0], VRScript.Math.Vector(0.01,0.01,0.01))
 # ghostMan.SetCapturedAnimation("jc-001.fbx")
 
-theJasper.AddMusic("..\\Music\\evilhaa.wav")
 theJasper.AddMusic("..\\Music\\lux.wav")
