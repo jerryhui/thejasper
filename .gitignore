@@ -1,4 +1,6 @@
-Models\
 Models\*
+Music\*
+Animations\*
 *.fbx
 *.pyc
+*.wav
