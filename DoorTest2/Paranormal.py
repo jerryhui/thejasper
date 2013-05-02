@@ -2,6 +2,7 @@ import VRScript
 import lel_common
 import Animation
 import math
+import random
 import time
 
 # Enumerates all possible states of a paranormal. See documentation for Paranormal for more.
@@ -148,8 +149,9 @@ class Paranormal(lel_common.GenericObject):
 				
 	# Runs visual feedback of successful capture.
 	def CapturedAnimation(self):
-		print("You have captured "+str(self)+"!\n")
-		self.renderable(self.name).hide()
+		if (self.renderable(self.name).isVisible()):
+			print("You have captured "+str(self)+"!\n")
+			self.renderable(self.name).hide()
 		if (self.animObj is not None):
 			self.animObj.renderable('').hide()
 	
@@ -218,8 +220,50 @@ class Ghost(Paranormal):
 			self.movable().setPose(m)
 			self.hover += self.hoverSpeed
 			self.hover %= 360	
+
+# Represents a ghost that flies straight up and away when captured.
+class GhostFlyaway(Ghost):
+	def Capture(self):
+		self.flyCount=50
+		self.flyDistance=0.01
+		Paranormal.Capture(self)
+		self.hover=-1	# turns off hovering
 	
-class EvilSoup(Paranormal):
+	# Sends the ghost up high heavens...
+	def CapturedAnimation(self):
+		if (self.flyCount>0):
+			print("Capture - fly away count=", self.flyCount)
+			m = self.movable().getPose()
+			m.preTranslation(VRScript.Math.Vector(0,0,self.flyDistance))
+			self.movable().setPose(m)
+			self.flyCount -= 1
+			self.flyDistance *= 2
+		else:
+			self.renderable('').hide()
+			
+class Crawler(Paranormal):
 	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding):
 		Paranormal.__init__(self, name, sMeshName, location, discoverCommand, initState)
-		self.type = "evil soup"
+		self.crawlDistance = 5
+		self.type = "crawler"
+		print("New Crawler " + name)
+
+	def OnInit(self,cbInfo):
+		Paranormal.OnInit(self,cbInfo)
+		p = self.physical('')
+		if (type(p) is VRScript.Core.Physical):
+			print ("p is a Physical")
+		pProp = VRScript.Core.PhysicsProperties(200,1,.99,.99,.5)
+		self.physical('').setPhysicsProperties(pProp)
+	
+	def IdleAnimation(self):
+		# Crawl around
+		if (self.crawlDistance > 0):
+			print("{0} crawlDistance={1}".format(self,self.crawlDistance))
+			p = self.physical('')
+			p.setCollisionType(VRScript.Core.CollisionType.Dynamic)
+			p.applyImpulse(VRScript.Math.Vector(1,0,1), VRScript.Math.Vector(0,0,0))
+			self.crawlDistance -= 1
+		else:
+			self.crawlDistance = random.random()*15
+			
