@@ -54,4 +54,14 @@ class Door(lel_common.GenericObject):
 			else:
 				self.Open()
 				
-	
+class BumpableObj(lel_common.GenericObject):
+	def __init__(self,sName, sMeshName, position):
+		lel_common.GenericObject.__init__(self, sName, sMeshName, position, True, True, "Concave", True, "Kinematic")
+		self.bumpedSound = None
+		
+	def SetBumpedSound(self,file):
+		self.bumpedSound = Animation.AudioObj(sName + "_BumpedSound", file)
+		
+	def OnCollision(self,cbInfo):
+		if (type(self.bumpedSound) is Animation.AudioObj):
+			self.bumpedSound.Play()
