@@ -13,7 +13,6 @@ import Animation
 
 User = VRScript.Core.Entity('User0')	# User entity, declared for global reference.
 
-
 # Represents game stats and any other information that needs constant updating in CAVE.
 class EnvObject(VRScript.Core.Behavior):
 	def __init__(self,house):
@@ -28,6 +27,8 @@ class EnvObject(VRScript.Core.Behavior):
 	
 	# Initializes all stats.
 	def OnInit(self,cbInfo):
+		# User.physical('').enableProximity(True)	# enable proximity check on User0
+	
 		# create score text
 		self.scoreText = VRScript.Core.FontText('Score', 'You have caught {0} out of {1} ghosts'.format(self.paranormalCaptured,self.paranormalTotal))
 		self.scoreText.setColor(VRScript.Core.Color(1,1,0))
@@ -165,8 +166,7 @@ doorR = theJasper.AddObject(HouseObjects.Door("DoorLeft_1", "models\\DoorLeft_1.
 theJasper.set_physics_properties("DoorLeft_1", [1.0, 0.25, 0.9, 1, 0.5])
 
 ghostMan = theJasper.AddParanormal(Paranormal.Ghost("ghostMan", "models\\ghost-man.osg", [0,0,0], "LOOK"))
-ghostMan.SetDiscoveredSound("..\\Music\\moan.wav",True)
 # ghostMan.SetDiscoveredAnimation("001-01start.fbx", VRScript.Core.PlayMode.Loop, [90,0,0], VRScript.Math.Vector(0.01,0.01,0.01))
 # ghostMan.SetCapturedAnimation("jc-001.fbx")
 
-theJasper.AddMusic("..\\Music\\lux.wav")
+theJasper.AddMusic("lux.wav")

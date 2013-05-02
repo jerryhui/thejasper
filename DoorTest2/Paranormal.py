@@ -56,7 +56,7 @@ class Paranormal(lel_common.GenericObject):
 		return (self.state == ParanormalState.Captured)
 
 	# Sets the animation file to play when this paranormal is discovered.
-	# Set this to null if a programmatic animation is to be used; implement DiscoveredAnimation()
+	# Set this to None if a programmatic animation is to be used; implement DiscoveredAnimation()
 	# to provide programmatic animation.
 	# Inputs:
 	#	file - file name of FBX
@@ -65,6 +65,10 @@ class Paranormal(lel_common.GenericObject):
 		self.discoveredFBX = Animation.AnimationMeta(self.name + "_discovered", file, mode, preScale, preAngles)
 		print ("Set discovery anim for " + str(self) + " to " + file)
 
+	# Sets the audio file to play when this paranormal is discovered.
+	# Inputs:
+	#	file - file name of audio
+	#	loop(OPT) - True if sound should be looped whenever the paranormal is discovered; default=True
 	def SetDiscoveredSound(self, file, loop=True):
 		self.discoveredAudio = Animation.AudioObj(self.name + "_discovered", file, loop)
 		print ("Set discovered audio for " + str(self) + " to " + file)
@@ -74,6 +78,7 @@ class Paranormal(lel_common.GenericObject):
 	def Discover(self):
 		if (self.state == ParanormalState.Hiding):
 			self.state = ParanormalState.Discovered
+			# play animation
 			if (self.discoveredFBX is None):
 				self.DiscoveredAnimation()
 			else:
@@ -83,10 +88,9 @@ class Paranormal(lel_common.GenericObject):
 				self.animObj.LoadAnimMeta(self.discoveredFBX)
 				self.animObj.SetPosition(self.movable().getPose())
 				self.animObj.Play(self.discoveredAnimPlaymode)
+			# play audio
 			if (self.discoveredAudio is not None):
-				aud=self.discoveredAudio.MakeAudible()
-				self.attach(aud)
-				aud.play()
+				self.discoveredAudio.Play()
 
 	# Sets the animation file to play when this paranormal is captured.
 	# Set this to null if a programmatic animation is to be used; implement CapturedAnimation()
@@ -97,26 +101,36 @@ class Paranormal(lel_common.GenericObject):
 	def SetCapturedAnimation(self, file, mode=VRScript.Core.PlayMode.Once, preAngles=[0,0,0], preScale=VRScript.Math.Vector(1,1,1)):
 		self.capturedFBX = Animation.AnimationMeta(self.name + "_discovered", file, mode, preScale, preAngles)
 
+	# Sets the audio file to play when this paranormal is captured.
+	# Inputs:
+	#	file - file name of audio
+	#	loop(OPT) - True if sound should be looped whenever the paranormal is discovered; default=False
+	def SetCapturedSound(self, file, loop=False):
+		self.capturedAudio = Animation.AudioObj(self.name + "_captured", file, loop)
+		print ("Set discovered audio for " + str(self) + " to " + file)
+		
 	# Captures this Paranormal. Note that the interactive method that calls this function
 	# will have to perform validation on whether the interaction was correct.
 	def Capture(self):
 		if (self.state == ParanormalState.Discovered):
-			if (self.discoveredAudio is not None):
-				self.discoveredAudio.FadeOut()
-				# self.discoveredAudio.GetAudible().stop()
 			self.state = ParanormalState.Captured
 			print(str(self) + ' is captured!')
-			self.CapturedAnimation()
-		if (self.capturedFBX is None):
-			print("Use CapturedAnimation()")
-			self.CapturedAnimation()
-		else:
-			self.renderable(self.name).hide()
-			self.animObj = Animation.AnimationObject(self.name + "_captured")
-			self.animObj.LoadAnimMeta(self.capturedFBX)
-			self.animObj.SetPosition(self.movable().getPose())
-			self.animObj.Play(self.capturedAnimPlaymode)
-
+			# play animation
+			if (self.capturedFBX is None):
+				print("Use CapturedAnimation()")
+				self.CapturedAnimation()
+			else:
+				self.renderable(self.name).hide()
+				self.animObj = Animation.AnimationObject(self.name + "_captured")
+				self.animObj.LoadAnimMeta(self.capturedFBX)
+				self.animObj.SetPosition(self.movable().getPose())
+				self.animObj.Play(self.capturedAnimPlaymode)
+			# play audio
+			if (self.discoveredAudio is not None):
+				self.discoveredAudio.Stop(self.capturedAudio is None, -0.5)
+			if (self.capturedAudio is not None):
+				self.capturedAudio.Play()
+				
 	# Advances the state. 
 	# Returns: True if state was advanced.
 	def AdvanceState(self):
@@ -144,13 +158,19 @@ class Paranormal(lel_common.GenericObject):
 		# implement if idle animation via programming is wanted
 		pass
 	
+	# def OnInit(self, cbInfo):
+		# self.physical('').enableProximity(True)
+	
 	# Implements VRScript.Core.Behavior.OnUpdate.
 	def OnUpdate(self, cbInfo):
 		if (self.state == ParanormalState.Discovered):
 			self.IdleAnimation()
 		elif (self.state == ParanormalState.Captured):
 			self.CapturedAnimation()
-		
+
+	def OnProximity(self,cbInfo, intInfo):
+		print ('detected Proximity for ' + str(self) + ' against object: ' + (intInfo.otherEntity.getName()) + ' at distance{0}'.format(intInfo.distance))
+			
 	# Implements VRScript.Core.Behavior.OnButtonRelease.
 	# Discovers/catches the paranormal by button click.
 	def OnButtonRelease(self, cbInfo, btnInfo, intInfo):
@@ -166,6 +186,8 @@ class Ghost(Paranormal):
 		self.hoverDistance = hoverDist
 		self.hoverSpeed = hoverSpeed
 		self.shrinkCount = 0
+		self.SetDiscoveredSound("moan.wav")
+		self.SetCapturedSound("scream1.wav")
 		print("New ghost " + name + " created")
 	
 	def Discover(self):

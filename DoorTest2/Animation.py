@@ -1,10 +1,12 @@
 import VRScript
+import JasperConfig
 
+# Represents an audio.
 class AudioObj(VRScript.Core.Behavior):
 	def __init__(self, name, file, loop=False):
 		VRScript.Core.Behavior.__init__(self,name)
 		self.name = name
-		self.file = file
+		self.file = JasperConfig.MusicDir + file
 		self.loop = loop
 		self.audible = None
 		self.fadingDir = 0		# >0: fade in; <0: fade out
@@ -43,7 +45,19 @@ class AudioObj(VRScript.Core.Behavior):
 			self.FadeIn(fadeInStep)
 		if (not aud.isPlaying()):
 			aud.play()
-	
+
+	# Stops this sound, with optional fade out.
+	# Inputs:
+	#	bool fadeOut (OPT) - True is fade out should be used; default = False
+	#	float fadeOutStep(OPT) - step to fade out
+	def Stop(self,fadeOut=False,fadeOutStep=-0.95):
+		aud = self.GetAudible()
+		if (aud is None): return
+		if (fadeOut):
+			self.FadeOut(fadeOutStep)
+		else:
+			aud.stop()
+
 	# Sets the gain of playback.
 	# Input:
 	#	float g (OPT) - output gain

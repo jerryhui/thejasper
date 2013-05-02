@@ -15,7 +15,7 @@ class Door(lel_common.GenericObject):
 		lel_common.GenericObject.__init__(self, sName, sMeshName, position, True, True, "Concave", True, "Static")
 		self.isOpen = isOpen
 		self.openAngle = openAngle
-		self.soundFX = Animation.AudioObj(sName + "_fx", "..\\Music\\door.wav")
+		self.soundFX = Animation.AudioObj(sName + "_fx", "door.wav")
 
 	def OnInit(self, cbInfo):
 		lel_common.GenericObject.OnInit(self, cbInfo)
