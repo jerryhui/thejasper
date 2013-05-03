@@ -1,3 +1,4 @@
 # Sets up directories
 MusicDir = "..\\Music\\"
-ModelDir = ""
+ModelsDir = "..\\Models\\"
+MonstersDir = "..\\Models\\Monsters\\"

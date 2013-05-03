@@ -4,6 +4,7 @@ import Animation
 import math
 import random
 import time
+import JasperConfig
 
 # Enumerates all possible states of a paranormal. See documentation for Paranormal for more.
 class ParanormalState:
@@ -32,7 +33,7 @@ class Paranormal(lel_common.GenericObject):
 	#		location - Location within model (use VRScript's format)
 	#		discoverCommand - voice command to discover this paranormal
 	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding):
-		lel_common.GenericObject.__init__(self, name, sMeshName, location, True, True, "Concave", True, "Static")
+		lel_common.GenericObject.__init__(self, name, JasperConfig.MonstersDir + sMeshName, location, True, True, "Concave", True, "Static")
 		self.state = initState
 		self.discoverCommand = discoverCommand
 		self.type = "paranormal"
@@ -206,7 +207,7 @@ class Ghost(Paranormal):
 		if (self.shrinkCount>0):
 			print("Capture - shrink, shrink count=", self.shrinkCount)
 			m = self.movable().getPose()
-			m.postScale(VRScript.Math.Vector(0.9,0.9,0.9))
+			m.preScale(VRScript.Math.Vector(0.9,0.9,0.9))
 			self.movable().setPose(m)
 			self.shrinkCount -= 1
 		else:

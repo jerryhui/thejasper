@@ -154,20 +154,23 @@ class HauntedHouseEngine(lel_common.LELScenario):
 		self.env.AddMusic(file)
 
 		
-#------------------------------------------------------------------------------		
+#------------------------------------------------------------------------------
+#-------------------------- MAIN PROGRAM --------------------------------------
 
 theJasper = HauntedHouseEngine()
 
-doorL = theJasper.AddObject(HouseObjects.Door("DoorLeft", "models\\DoorLeft.osg", [-5.09199479842989,-4.40669061564667,-6.72643819712604e-018], True, -90))
+doorL = theJasper.AddObject(HouseObjects.Door("DoorLeft", "DoorLeft.osg", [-5.09199479842989,-4.40669061564667,-6.72643819712604e-018], True, -90))
 theJasper.set_physics_properties("DoorLeft", [1.0, 0.25, 0.9, 1, 0.5])
 
-doorR = theJasper.AddObject(HouseObjects.Door("DoorLeft_1", "models\\DoorLeft_1.osg", [-3.40250259842728,-4.42017033590422,-6.54019670039207e-018], True, 90))
+doorR = theJasper.AddObject(HouseObjects.Door("DoorLeft_1", "DoorLeft.osg", [-3.40250259842728,-4.42017033590422,-6.54019670039207e-018], True, 90))
 theJasper.set_physics_properties("DoorLeft_1", [1.0, 0.25, 0.9, 1, 0.5])
 
-boxMonster = theJasper.AddParanormal(Paranormal.GhostFlyaway("boxMonster", "..\\Models\\Monsters\\boxmon.osg", [-1,-3,0], "TOUCH"))
-boxMonster2 = theJasper.AddParanormal(Paranormal.Crawler("boxMonster2", "..\\Models\\Monsters\\boxmon.osg", [-1.5,-4,0], "TOUCH"))
+boxMonster = theJasper.AddParanormal(Paranormal.GhostFlyaway("boxMonster", "boxmon.osg", [-1,-3,0], "TOUCH"))
+boxMonster2 = theJasper.AddParanormal(Paranormal.Crawler("boxMonster2", "boxmon.osg", [-1.5,-4,0], "TOUCH"))
 
-ghostMan = theJasper.AddParanormal(Paranormal.Ghost("ghostMan", "models\\ghost-man.osg", [0,0,0], "LOOK"))
+ghostMan = theJasper.AddParanormal(Paranormal.Ghost("ghostMan", "ghostman.ive", [0,0,0], "LOOK"))
+ghostMan = theJasper.AddParanormal(Paranormal.GhostFlyaway("ghostManFlyaway", "ghostman.ive", [-1,-2,0], "LOOK"))
+
 # ghostMan.SetDiscoveredAnimation("001-01start.fbx", VRScript.Core.PlayMode.Loop, [90,0,0], VRScript.Math.Vector(0.01,0.01,0.01))
 # ghostMan.SetCapturedAnimation("jc-001.fbx")
 

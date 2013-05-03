@@ -1,6 +1,7 @@
 import VRScript
 import lel_common
 import Animation
+import JasperConfig
 
 # A Door instance is a door that will open and close when user approaches, with animation and audio.
 class Door(lel_common.GenericObject):
@@ -12,7 +13,7 @@ class Door(lel_common.GenericObject):
 	#		isOpen - set to True if the object is the model of an open door
 	#		openAngle - the angle to turn in order to OPEN the door
 	def __init__(self, sName, sMeshName, position, isOpen, openAngle):
-		lel_common.GenericObject.__init__(self, sName, sMeshName, position, True, True, "Concave", True, "Static")
+		lel_common.GenericObject.__init__(self, sName, JasperConfig.ModelsDir + sMeshName, position, True, True, "Concave", True, "Static")
 		self.isOpen = isOpen
 		self.openAngle = openAngle
 		self.soundFX = Animation.AudioObj(sName + "_fx", "door.wav")
