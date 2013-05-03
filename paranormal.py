@@ -48,11 +48,11 @@ class Paranormal(lel_common.GenericObject):
 	
 	# Converts this Paranormal to a string.
 	def __str__(self):
-		return self.getName()
+		return self.getName()  + " the " + self.type
 
 	# Returns the name of this paranormal.
 	def getName(self):
-		return self.name + " the " + self.type
+		return self.name
 
 	def IsCaptured(self):
 		return (self.state == ParanormalState.Captured)
@@ -72,7 +72,7 @@ class Paranormal(lel_common.GenericObject):
 	#	file - file name of audio
 	#	loop(OPT) - True if sound should be looped whenever the paranormal is discovered; default=True
 	def SetDiscoveredSound(self, file, loop=True):
-		self.discoveredAudio = Animation.AudioObj(self.name + "_discovered", file, loop)
+		self.discoveredAudio = Animation.AudioObj(self.name + "_discovered", file, loop, self)
 		print ("Set discovered audio for " + str(self) + " to " + file)
 		
 	# Discovers this paranormal. Note that the interactive method that calls this function
@@ -108,7 +108,7 @@ class Paranormal(lel_common.GenericObject):
 	#	file - file name of audio
 	#	loop(OPT) - True if sound should be looped whenever the paranormal is discovered; default=False
 	def SetCapturedSound(self, file, loop=False):
-		self.capturedAudio = Animation.AudioObj(self.name + "_captured", file, loop)
+		self.capturedAudio = Animation.AudioObj(self.name + "_captured", file, loop, self)
 		print ("Set discovered audio for " + str(self) + " to " + file)
 		
 	# Captures this Paranormal. Note that the interactive method that calls this function

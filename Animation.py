@@ -1,9 +1,10 @@
 import VRScript
 import JasperConfig
+import JasperEngine
 
 # Represents an audio.
 class AudioObj(VRScript.Core.Behavior):
-	def __init__(self, name, file, loop=False):
+	def __init__(self, name, file, loop=False, parent=None):
 		VRScript.Core.Behavior.__init__(self,name)
 		self.name = name
 		self.file = JasperConfig.MusicDir + file
@@ -11,9 +12,17 @@ class AudioObj(VRScript.Core.Behavior):
 		self.audible = None
 		self.fadingDir = 0		# >0: fade in; <0: fade out
 		self.fadingCur = 1
+		self.parent = parent
+		self.dist = 0
+		self.curGain = 1
+		if (parent is not None):
+			print("Parent for this sound set to " + str(parent))
 		
 	def __str__(self):
 		return self.name
+	
+	def SetParent(self,parent):
+		self.parent = parent
 	
 	# Creates a new instance of Audible.
 	# Input:
@@ -25,6 +34,11 @@ class AudioObj(VRScript.Core.Behavior):
 		audioProp = aud.getAudioProperties()
 		audioProp.loop = self.loop
 		aud.setAudioProperties(audioProp)
+		if (self.parent is not None):
+			m = self.parent.movable().getPose()
+			self.movable().setPose(m)
+			print("MakeAudible() - set parent to " + str(self.parent.getName()))
+		# else:
 		self.audible = aud
 		return aud
 	
@@ -62,11 +76,13 @@ class AudioObj(VRScript.Core.Behavior):
 	# Input:
 	#	float g (OPT) - output gain
 	def SetGain(self,g):
-		aud = self.GetAudible()
-		if (aud is None): return
-		audioProp = aud.getAudioProperties()
-		audioProp.gain = g
-		aud.setAudioProperties(audioProp)
+		if (g != self.curGain):
+			aud = self.GetAudible()
+			if (aud is None): return
+			audioProp = aud.getAudioProperties()
+			audioProp.gain = g
+			aud.setAudioProperties(audioProp)
+			self.curGain = g
 	
 	# Begins fading in this sound.
 	# Note: Audible must already be playing; best call through Play()
@@ -92,22 +108,52 @@ class AudioObj(VRScript.Core.Behavior):
 		print("Begin fade out " + self.name)
 	
 	def OnUpdate(self,cbInfo):
+		totalGain = 1
+	
 		if (self.fadingDir < 0):
 			# fade out
-			self.SetGain(self.fadingCur)
+			totalGain = self.fadingCur
 			self.fadingCur *= (self.fadingDir*-1)
 			if (self.fadingCur < 0.01):
+				# fade out finished
 				self.fadingDir = 0
 				self.fadingCur = 1
 				self.GetAudible().stop()
+				return
 		elif (self.fadingDir > 0):
 			# fade in
-			self.SetGain(self.fadingCur)
+			totalGain = self.fadingCur
 			self.fadingCur *= self.fadingDir
 			if (self.fadingCur > 0.95):
+				# fade in finished
 				self.fadingDir = 0
 				self.fadingCur = 1
 				self.SetGain(1)
+				return
+				
+		# adjust volume according to distance from user0
+		aud = self.GetAudible()
+		if (aud is not None):
+			if (aud.isPlaying()):
+				if (self.parent is not None):
+					m = self.parent.movable().getPose()					
+					uv = JasperEngine.User.movable().getPose().getTranslation()
+					sv = m.getTranslation()
+					d = uv-sv
+					dist = int(d.length2())
+					
+					if (dist != 0):
+						if (dist > 30):
+							totalGain *= (1/(dist-29))
+						elif (dist > 50):
+							totalGain = 0
+
+					if (dist != self.dist):
+						self.dist = dist
+						print ("{0} dist={1}, gain->{2}".format(self,str(dist),totalGain))
+						
+		self.SetGain(totalGain)
+		
 
 # Represents metadata for an animation that will be loaded later.
 #	name - human readable name for animation
