@@ -23,13 +23,13 @@ class EnvObject(VRScript.Core.Behavior):
 		# create score text
 		self.scoreText = VRScript.Core.FontText('Score', 'You have caught {0} out of {1} ghosts'.format(self.paranormalCaptured,self.paranormalTotal))
 		self.scoreText.setColor(VRScript.Core.Color(1,1,0))
-		self.scoreText.setHeight(.1)
+		self.scoreText.setHeight(.05)
 		self.scoreText.show()
 		self.attach(self.scoreText)
 		
 		self.movable().setParent('User0Head')
 		m = self.movable().getPose()
-		m.preTranslation(VRScript.Math.Vector(0, 1, .65))
+		m.preTranslation(VRScript.Math.Vector(0, .75, .5))
 		self.movable().setPose(m)
 		
 		# sets up background music
