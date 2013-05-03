@@ -178,7 +178,7 @@ class Paranormal(lel_common.GenericObject):
 	# Discovers/catches the paranormal by button click.
 	def OnButtonRelease(self, cbInfo, btnInfo, intInfo):
 		print(str(self) + " is clicked.")
-		if (btnInfo.button == 0):
+		if (btnInfo.button < 5 ):
 			self.AdvanceState()
 	
 class Ghost(Paranormal):
@@ -254,7 +254,7 @@ class Crawler(Paranormal):
 		p = self.physical('')
 		if (type(p) is VRScript.Core.Physical):
 			print ("p is a Physical")
-		pProp = VRScript.Core.PhysicsProperties(200,1,.99,.99,.5)
+		pProp = VRScript.Core.PhysicsProperties(1,1,.99,.99,.5)
 		self.physical('').setPhysicsProperties(pProp)
 	
 	def IdleAnimation(self):
@@ -263,8 +263,8 @@ class Crawler(Paranormal):
 			print("{0} crawlDistance={1}".format(self,self.crawlDistance))
 			p = self.physical('')
 			p.setCollisionType(VRScript.Core.CollisionType.Dynamic)
-			p.applyImpulse(VRScript.Math.Vector(1,0,1), VRScript.Math.Vector(0,0,0))
+			p.applyImpulse(VRScript.Math.Vector(0.5,0,1), VRScript.Math.Vector(0,0,0))
 			self.crawlDistance -= 1
 		else:
-			self.crawlDistance = random.random()*15
+			self.crawlDistance = 0
 			

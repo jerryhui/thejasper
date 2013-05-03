@@ -2,7 +2,9 @@ import VRScript
 import lel_common
 import Animation
 import math
+import random
 import time
+import JasperConfig
 
 # Enumerates all possible states of a paranormal. See documentation for Paranormal for more.
 class ParanormalState:
@@ -31,7 +33,7 @@ class Paranormal(lel_common.GenericObject):
 	#		location - Location within model (use VRScript's format)
 	#		discoverCommand - voice command to discover this paranormal
 	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding):
-		lel_common.GenericObject.__init__(self, name, sMeshName, location, True, True, "Concave", True, "Static")
+		lel_common.GenericObject.__init__(self, name, JasperConfig.MonstersDir + sMeshName, location, True, True, "Concave", True, "Static")
 		self.state = initState
 		self.discoverCommand = discoverCommand
 		self.type = "paranormal"
@@ -148,8 +150,9 @@ class Paranormal(lel_common.GenericObject):
 				
 	# Runs visual feedback of successful capture.
 	def CapturedAnimation(self):
-		print("You have captured "+str(self)+"!\n")
-		self.renderable(self.name).hide()
+		if (self.renderable(self.name).isVisible()):
+			print("You have captured "+str(self)+"!\n")
+			self.renderable(self.name).hide()
 		if (self.animObj is not None):
 			self.animObj.renderable('').hide()
 	
@@ -175,7 +178,7 @@ class Paranormal(lel_common.GenericObject):
 	# Discovers/catches the paranormal by button click.
 	def OnButtonRelease(self, cbInfo, btnInfo, intInfo):
 		print(str(self) + " is clicked.")
-		if (btnInfo.button == 0):
+		if (btnInfo.button < 3):
 			self.AdvanceState()
 	
 class Ghost(Paranormal):
@@ -204,7 +207,7 @@ class Ghost(Paranormal):
 		if (self.shrinkCount>0):
 			print("Capture - shrink, shrink count=", self.shrinkCount)
 			m = self.movable().getPose()
-			m.postScale(VRScript.Math.Vector(0.9,0.9,0.9))
+			m.preScale(VRScript.Math.Vector(0.9,0.9,0.9))
 			self.movable().setPose(m)
 			self.shrinkCount -= 1
 		else:
@@ -222,14 +225,46 @@ class Ghost(Paranormal):
 # Represents a ghost that flies straight up and away when captured.
 class GhostFlyaway(Ghost):
 	def Capture(self):
-		self.flyCount=20
+		self.flyCount=50
+		self.flyDistance=0.01
 		Paranormal.Capture(self)
 		self.hover=-1	# turns off hovering
+	
+	# Sends the ghost up high heavens...
 	def CapturedAnimation(self):
 		if (self.flyCount>0):
-			pass
+			print("Capture - fly away count=", self.flyCount)
+			m = self.movable().getPose()
+			m.preTranslation(VRScript.Math.Vector(0,0,self.flyDistance))
+			self.movable().setPose(m)
+			self.flyCount -= 1
+			self.flyDistance *= 2
+		else:
+			self.renderable('').hide()
 			
-class EvilSoup(Paranormal):
+class Crawler(Paranormal):
 	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding):
 		Paranormal.__init__(self, name, sMeshName, location, discoverCommand, initState)
-		self.type = "evil soup"
+		self.crawlDistance = 5
+		self.type = "crawler"
+		print("New Crawler " + name)
+
+	def OnInit(self,cbInfo):
+		Paranormal.OnInit(self,cbInfo)
+		p = self.physical('')
+		if (type(p) is VRScript.Core.Physical):
+			print ("p is a Physical")
+		pProp = VRScript.Core.PhysicsProperties(1,1,.99,.99,.5)
+		self.physical('').setPhysicsProperties(pProp)
+	
+	def IdleAnimation(self):
+		# Crawl around
+		if (self.crawlDistance > 0):
+			print("{0} crawlDistance={1}".format(self,self.crawlDistance))
+			p = self.physical('')
+			p.setCollisionType(VRScript.Core.CollisionType.Dynamic)
+			p.applyImpulse(VRScript.Math.Vector(0.5,0,1), VRScript.Math.Vector(0,0,0))
+			self.crawlDistance -= 1
+		else:
+			self.crawlDistance = 0
+			

@@ -1,4 +1,4 @@
 # Sets up directories
 MusicDir = "Music\\"
-ModelDir = ""
-# Sets up directories
+ModelsDir = "Models\\"
+MonstersDir = "Models\\Monsters\\"
