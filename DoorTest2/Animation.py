@@ -39,6 +39,7 @@ class AudioObj(VRScript.Core.Behavior):
 	#	bool fadeIn (OPT) - True is fade in should be used; default = False
 	#	float fadeInStep(OPT) - step to fade in
 	def Play(self,fadeIn=False,fadeInStep=1.1):
+		print("Audio: playing " + self.name)
 		aud = self.GetAudible()
 		if (aud is None): aud = self.MakeAudible()
 		if (fadeIn):
@@ -51,6 +52,7 @@ class AudioObj(VRScript.Core.Behavior):
 	#	bool fadeOut (OPT) - True is fade out should be used; default = False
 	#	float fadeOutStep(OPT) - step to fade out
 	def Stop(self,fadeOut=False,fadeOutStep=-0.95):
+		print("Audio: stopping " + self.name)
 		aud = self.GetAudible()
 		if (aud is None): return
 		if (fadeOut):

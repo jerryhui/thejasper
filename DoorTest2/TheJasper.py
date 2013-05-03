@@ -27,8 +27,6 @@ class EnvObject(VRScript.Core.Behavior):
 	
 	# Initializes all stats.
 	def OnInit(self,cbInfo):
-		# User.physical('').enableProximity(True)	# enable proximity check on User0
-	
 		# create score text
 		self.scoreText = VRScript.Core.FontText('Score', 'You have caught {0} out of {1} ghosts'.format(self.paranormalCaptured,self.paranormalTotal))
 		self.scoreText.setColor(VRScript.Core.Color(1,1,0))
@@ -46,7 +44,8 @@ class EnvObject(VRScript.Core.Behavior):
 			# aud = VRScript.Core.Audible("{0}_bkg{1}".format(self.name,i),self.bkgMusicFiles[i])
 			aud = Animation.AudioObj("{0}_bkg{1}".format(self.name,i),self.bkgMusicFiles[i])
 			self.bkgMusic.append(aud)
-			self.attach(self.bkgMusic[i])
+			print(str(aud))
+			self.attach(aud.MakeAudible())
 		self.bkgMusicIndex = len(self.bkgMusic)-1	# always begin with track 1
 		
 	# Sets the number of total paranormals.
@@ -164,6 +163,9 @@ theJasper.set_physics_properties("DoorLeft", [1.0, 0.25, 0.9, 1, 0.5])
 
 doorR = theJasper.AddObject(HouseObjects.Door("DoorLeft_1", "models\\DoorLeft_1.osg", [-3.40250259842728,-4.42017033590422,-6.54019670039207e-018], True, 90))
 theJasper.set_physics_properties("DoorLeft_1", [1.0, 0.25, 0.9, 1, 0.5])
+
+boxMonster = theJasper.AddParanormal(Paranormal.GhostFlyaway("boxMonster", "..\\Models\\Monsters\\boxmon.osg", [-1,-3,0], "TOUCH"))
+boxMonster2 = theJasper.AddParanormal(Paranormal.Crawler("boxMonster2", "..\\Models\\Monsters\\boxmon.osg", [-1.5,-4,0], "TOUCH"))
 
 ghostMan = theJasper.AddParanormal(Paranormal.Ghost("ghostMan", "models\\ghost-man.osg", [0,0,0], "LOOK"))
 # ghostMan.SetDiscoveredAnimation("001-01start.fbx", VRScript.Core.PlayMode.Loop, [90,0,0], VRScript.Math.Vector(0.01,0.01,0.01))

@@ -1,5 +1,6 @@
 import VRScript
 import lel_common
+import Animation
 
 # A Door instance is a door that will open and close when user approaches, with animation and audio.
 class Door(lel_common.GenericObject):
@@ -14,6 +15,7 @@ class Door(lel_common.GenericObject):
 		lel_common.GenericObject.__init__(self, sName, sMeshName, position, True, True, "Concave", True, "Static")
 		self.isOpen = isOpen
 		self.openAngle = openAngle
+		self.soundFX = Animation.AudioObj(sName + "_fx", "door.wav")
 
 	def OnInit(self, cbInfo):
 		lel_common.GenericObject.OnInit(self, cbInfo)
@@ -25,6 +27,8 @@ class Door(lel_common.GenericObject):
 		m = self.movable().getPose()
 		m.postEuler(x,y,z)
 		self.movable().setPose(m)
+		if (type(self.soundFX) is Animation.AudioObj): 
+			self.soundFX.Play()
 		#self.physical('').applyImpulse( VRScript.Math.Vector(5,5,0), VRScript.Math.Vector(.125,.125,0) )
 		#self.physical('').applyImpulse( VRScript.Math.Vector(-2,-2,0), VRScript.Math.Vector(-.125,-.125,0) )
 	

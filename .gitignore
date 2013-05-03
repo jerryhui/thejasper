@@ -1,7 +1,7 @@
 Models\*
-Music\*
+Music\lux.wav
 Animations\*
 *.fbx
 *.pyc
-*.wav
 !README.txt
+.DS_Store
