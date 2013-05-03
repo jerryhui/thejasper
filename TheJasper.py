@@ -160,7 +160,7 @@ class HauntedHouseEngine(lel_common.LELScenario):
 
 theJasper = HauntedHouseEngine()
 
-theJasper.create_entity("fullHouse", "Models\\bigHouse.ive", [-5.09199479842989,-4.40669061564667,-6.72643819712604e-018], False, False, "Concave", False, "Static")
+theJasper.create_entity("fullHouse", "Models\\bigHouse.ive", [-5.09199479842989,-4.40669061564667,-6.72643819712604e-018], True, False, "Concave", False, "Static")
 
 
 # doorL = theJasper.AddObject(HouseObjects.Door("DoorLeft", "models\\DoorLeft.osg", [-5.09199479842989,-4.40669061564667,-6.72643819712604e-018], True, -90))
