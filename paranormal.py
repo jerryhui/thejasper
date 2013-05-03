@@ -161,8 +161,9 @@ class Paranormal(lel_common.GenericObject):
 		# implement if idle animation via programming is wanted
 		pass
 	
-	# def OnInit(self, cbInfo):
-		# self.physical('').enableProximity(True)
+	def OnInit(self, cbInfo):
+		lel_common.GenericObject.OnInit(self, cbInfo)
+		self.physical('').enableProximity(True)
 	
 	# Implements VRScript.Core.Behavior.OnUpdate.
 	def OnUpdate(self, cbInfo):
@@ -172,7 +173,8 @@ class Paranormal(lel_common.GenericObject):
 			self.CapturedAnimation()
 
 	def OnProximity(self,cbInfo, intInfo):
-		print ('detected Proximity for ' + str(self) + ' against object: ' + (intInfo.otherEntity.getName()) + ' at distance{0}'.format(intInfo.distance))
+		if (self.state == ParanormalState.Discovered):
+			print ('detected Proximity for ' + str(self) + ' against object: ' + (intInfo.otherEntity.getName()) + ' at distance{0}'.format(intInfo.distance))
 			
 	# Implements VRScript.Core.Behavior.OnButtonRelease.
 	# Discovers/catches the paranormal by button click.

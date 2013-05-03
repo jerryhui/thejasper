@@ -31,6 +31,13 @@ class EnvObject(VRScript.Core.Behavior):
 		m = self.movable().getPose()
 		m.preTranslation(VRScript.Math.Vector(0, .75, .5))
 		self.movable().setPose(m)
+
+		# allow proximity check on User0
+		posCheckBox = VRScript.Resources.Box()
+		self.attach(VRScript.Core.Renderable('User0PhyBox',posCheckBox))
+		self.attach(VRScript.Core.Physical('User0Phy',posCheckBox))
+		self.physical('User0Phy').setCollisionType(VRScript.Core.CollisionType.Static)
+		self.physical('User0Phy').enableProximity(True)
 		
 		# sets up background music
 		for i in range(len(self.bkgMusicFiles)):
