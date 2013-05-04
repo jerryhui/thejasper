@@ -149,7 +149,7 @@ class AudioObj(VRScript.Core.Behavior):
 					uv = JasperEngine.User.movable().getPose().getTranslation()
 					sv = m.getTranslation()
 					d = uv-sv
-					dist = int(d.length2())
+					dist = int(d.length())
 					
 					if (dist != 0):
 						if (dist > 30):
@@ -159,7 +159,7 @@ class AudioObj(VRScript.Core.Behavior):
 
 					if (dist != self.dist):
 						self.dist = dist
-						print ("{0} dist={1}, gain->{2}".format(self,str(dist),totalGain))
+						# print ("{0} dist={1}, gain->{2}".format(self,str(dist),totalGain))
 						
 		self.SetGain(totalGain)
 		

@@ -13,6 +13,7 @@ import math
 import random
 import time
 import JasperConfig
+import JasperEngine
 
 # Enumerates all possible states of a paranormal. See documentation for Paranormal for more.
 class ParanormalState:
@@ -55,6 +56,8 @@ class Paranormal(lel_common.GenericObject):
 		self.animObj = None
 		self.discoveredAnimPlaymode = VRScript.Core.PlayMode.Loop
 		self.capturedAnimPlaymode = VRScript.Core.PlayMode.Once
+		self.userDist = 0
+		self.userProxTrigger = -1
 		print(self.name + " initialized. Current state=" + str(self.state))
 	
 	# Converts this Paranormal to a string.
@@ -65,9 +68,16 @@ class Paranormal(lel_common.GenericObject):
 	def getName(self):
 		return self.name
 
+	# Returns true if this paranormal is captured.
 	def IsCaptured(self):
 		return (self.state == ParanormalState.Captured)
 
+	# Sets the distance from the user that will trigger OnUserProximity event.
+	# Input:
+	#	pd - distance that will trigger event.
+	def SetUserProximityTrigger(self, pd):
+		self.userProxTrigger = pd
+		
 	# Sets the animation file to play when this paranormal is discovered.
 	# Set this to None if a programmatic animation is to be used; implement DiscoveredAnimation()
 	# to provide programmatic animation.
@@ -171,13 +181,35 @@ class Paranormal(lel_common.GenericObject):
 	def IdleAnimation(self):
 		# implement if idle animation via programming is wanted
 		pass
+
+	# Calculates the distance between self and User0.
+	# Returns:
+	#	(float) distance between self and User0
+	def UserDistance(self):
+		m = self.movable().getPose()					
+		uv = JasperEngine.User.movable().getPose().getTranslation()
+		sv = m.getTranslation()
+		d = uv-sv	
+		return d.length()
+	
+	# This is triggered when the user is nearby. Implement if interaction is desired.
+	def OnUserProximity(self):
+		pass
 	
 	def OnInit(self, cbInfo):
 		lel_common.GenericObject.OnInit(self, cbInfo)
-		self.physical('').enableProximity(True)
+		# self.physical('').enableProximity(True)
 	
 	# Implements VRScript.Core.Behavior.OnUpdate.
 	def OnUpdate(self, cbInfo):
+		if (self.userProxTrigger > 0):
+			# implements user distance checking
+			d = self.UserDistance()
+			if (self.userDist != d):
+				self.userDist = d
+				if (d <= self.userProxTrigger):
+					self.OnUserProximity()
+					print("{0}.userDist={1}".format(self,d))
 		if (self.state == ParanormalState.Discovered):
 			self.IdleAnimation()
 		elif (self.state == ParanormalState.Captured):
@@ -191,13 +223,13 @@ class Paranormal(lel_common.GenericObject):
 			self.AdvanceState()
 	
 	# Implements VRScript.Core.Behavior.OnProximity.
-	def OnProximity(self,cbInfo, intInfo):
-		if ("NEAR" in self.discoverCommand and self.state == ParanormalState.Hiding):
-			if (intInfo.otherEntity.getName() == "User0" and intInfo.distance < 2):
-				print(str(self) + " discovered by proximity.")
-				self.AdvanceState()
-		if (self.state == ParanormalState.Discovered):
-			print ('detected Proximity for ' + str(self) + ' against object: ' + (intInfo.otherEntity.getName()) + ' at distance{0}'.format(intInfo.distance))
+	# def OnProximity(self,cbInfo, intInfo):
+		# if ("NEAR" in self.discoverCommand and self.state == ParanormalState.Hiding):
+			# if (intInfo.otherEntity.getName() == "User0" and intInfo.distance < 2):
+				# print(str(self) + " discovered by proximity.")
+				# self.AdvanceState()
+		# if (self.state == ParanormalState.Discovered):
+			# print (str(self) + ' is nearby object: ' + (intInfo.otherEntity.getName()) + ', distance{0}'.format(intInfo.distance))
 
 	
 class Ghost(Paranormal):
@@ -210,6 +242,7 @@ class Ghost(Paranormal):
 		self.shrinkCount = 0
 		self.SetDiscoveredSound("moan.wav")
 		self.SetCapturedSound("scream1.wav")
+		self.SetUserProximityTrigger(4)
 		print("New ghost " + name + " created")
 	
 	def Discover(self):
@@ -239,7 +272,13 @@ class Ghost(Paranormal):
 			m.preTranslation(VRScript.Math.Vector(0,0,math.sin(self.hover)*self.hoverDistance))
 			self.movable().setPose(m)
 			self.hover += self.hoverSpeed
-			self.hover %= 360	
+			self.hover %= 360
+			
+	def OnUserProximity(self):
+		Paranormal.OnUserProximity(self)
+		if (self.state == ParanormalState.Hiding):
+			print("You've found {0} by proximity!".format(self))
+			self.AdvanceState()
 
 # Represents a ghost that flies straight up and away when captured.
 class GhostFlyaway(Ghost):
