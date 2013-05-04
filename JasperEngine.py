@@ -1,3 +1,8 @@
+# JasperEngine.py
+# This contains the main game engine classes.
+# 	class EnvObject(VRScript.Core.Behavior)
+# 	class HauntedHouseEngine(lel_common.LELScenario)
+
 import VRScript
 import lel_common
 import HouseObjects
@@ -26,19 +31,21 @@ class EnvObject(VRScript.Core.Behavior):
 		self.scoreText.setHeight(.05)
 		self.scoreText.show()
 		self.attach(self.scoreText)
+
+		# allow proximity check on User0
+		posCheckBox = VRScript.Resources.Box(VRScript.Math.Vector(0.0001,0.0001,0.0001))
+		User.attach(VRScript.Core.Renderable('User0PhyBox',posCheckBox))
+		User.attach(VRScript.Core.Physical('User0Phy',posCheckBox))
+		User.renderable('User0PhyBox').show()
+		User.physical('User0Phy').setCollisionType(VRScript.Core.CollisionType.Static)
+		User.physical('User0Phy').enableProximity(True)
 		
+		# attach score text to user such that it is visible at all times
 		self.movable().setParent('User0Head')
 		m = self.movable().getPose()
 		m.preTranslation(VRScript.Math.Vector(0, .75, .5))
 		self.movable().setPose(m)
 
-		# allow proximity check on User0
-		posCheckBox = VRScript.Resources.Box()
-		self.attach(VRScript.Core.Renderable('User0PhyBox',posCheckBox))
-		self.attach(VRScript.Core.Physical('User0Phy',posCheckBox))
-		self.physical('User0Phy').setCollisionType(VRScript.Core.CollisionType.Static)
-		self.physical('User0Phy').enableProximity(True)
-		
 		# sets up background music
 		for i in range(len(self.bkgMusicFiles)):
 			# aud = VRScript.Core.Audible("{0}_bkg{1}".format(self.name,i),self.bkgMusicFiles[i])

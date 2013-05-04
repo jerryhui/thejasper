@@ -19,8 +19,8 @@ theJasper = HauntedHouseEngine()
 # boxMonster = theJasper.AddParanormal(Paranormal.GhostFlyaway("boxMonster", "boxmon.osg", [-1,-3,0], "TOUCH"))
 boxMonster2 = theJasper.AddParanormal(Paranormal.Crawler("boxMonster2", "boxmon.osg", [-1.5,-4,0], "TOUCH"))
 
-ghostMan = theJasper.AddParanormal(Paranormal.Ghost("ghostMan", "ghostman.ive", [0,0,0], "LOOK"))
-ghostMan = theJasper.AddParanormal(Paranormal.GhostFlyaway("ghostManFlyaway", "ghostman.ive", [-1,-2,0], "LOOK"))
+ghostMan = theJasper.AddParanormal(Paranormal.Ghost("ghostMan", "ghostman.ive", [0,0,0], "NEAR"))
+ghostMan = theJasper.AddParanormal(Paranormal.GhostFlyaway("ghostManFlyaway", "ghostman.ive", [-1,-2,0], "CLICK"))
 
 # ghostMan.SetDiscoveredAnimation("001-01start.fbx", VRScript.Core.PlayMode.Loop, [90,0,0], VRScript.Math.Vector(0.01,0.01,0.01))
 # ghostMan.SetCapturedAnimation("jc-001.fbx")

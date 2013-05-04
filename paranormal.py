@@ -1,3 +1,11 @@
+# Paranormal.py
+# Contains all classes that represent paranormals in The Jasper.
+#	class ParanormalState
+#	class Paranormal(lel_common.GenericObject)
+#	class Ghost(Paranormal)
+#	class GhostFlyaway(Ghost)
+#	class Crawler(Paranormal)
+
 import VRScript
 import lel_common
 import Animation
@@ -28,14 +36,17 @@ class ParanormalState:
 class Paranormal(lel_common.GenericObject):
 	# Constructor.
 	# Input:
-	#		name - Name of paranormal (for display)
-	#		sMeshName - Name of renderable file (OBJ or FBX)
-	#		location - Location within model (use VRScript's format)
-	#		discoverCommand - voice command to discover this paranormal
-	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding):
+	#		string name - Name of paranormal (for display)
+	#		string sMeshName - Name of renderable file (OBJ or FBX)
+	#		int[3] location - Location within model (use VRScript's format)
+	#		string discoverCommand - command to discover this paranormal
+	#		ParanormalState initState - initial state of paranormal
+	#		string captureCommand - command to catch this paranormal (default: CLICK)
+	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding, captureCommand="CLICK"):
 		lel_common.GenericObject.__init__(self, name, JasperConfig.MonstersDir + sMeshName, location, True, True, "Concave", True, "Static")
 		self.state = initState
 		self.discoverCommand = discoverCommand
+		self.captureCommand = captureCommand
 		self.type = "paranormal"
 		self.discoveredFBX = None
 		self.discoveredAudio = None
@@ -171,17 +182,23 @@ class Paranormal(lel_common.GenericObject):
 			self.IdleAnimation()
 		elif (self.state == ParanormalState.Captured):
 			self.CapturedAnimation()
-
-	def OnProximity(self,cbInfo, intInfo):
-		if (self.state == ParanormalState.Discovered):
-			print ('detected Proximity for ' + str(self) + ' against object: ' + (intInfo.otherEntity.getName()) + ' at distance{0}'.format(intInfo.distance))
 			
 	# Implements VRScript.Core.Behavior.OnButtonRelease.
 	# Discovers/catches the paranormal by button click.
 	def OnButtonRelease(self, cbInfo, btnInfo, intInfo):
 		print(str(self) + " is clicked.")
-		if (btnInfo.button < 3):
+		if ("CLICK" in self.captureCommand and btnInfo.button < 3):
 			self.AdvanceState()
+	
+	# Implements VRScript.Core.Behavior.OnProximity.
+	def OnProximity(self,cbInfo, intInfo):
+		if ("NEAR" in self.discoverCommand and self.state == ParanormalState.Hiding):
+			if (intInfo.otherEntity.getName() == "User0" and intInfo.distance < 2):
+				print(str(self) + " discovered by proximity.")
+				self.AdvanceState()
+		if (self.state == ParanormalState.Discovered):
+			print ('detected Proximity for ' + str(self) + ' against object: ' + (intInfo.otherEntity.getName()) + ' at distance{0}'.format(intInfo.distance))
+
 	
 class Ghost(Paranormal):
 	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding, hoverDist=0.001, hoverSpeed=0.01):
@@ -230,6 +247,8 @@ class GhostFlyaway(Ghost):
 		self.flyCount=50
 		self.flyDistance=0.01
 		Paranormal.Capture(self)
+		if (type(self.capturedAudio) is Animation.AudioObj):
+			self.capturedAudio.SetParent(None)
 		self.hover=-1	# turns off hovering
 	
 	# Sends the ghost up high heavens...

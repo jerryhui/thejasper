@@ -1,8 +1,17 @@
+# Animation.py
+# Contains classes that handle audio and animations.
+#	class AudioObj(VRScript.Core.Behavior)
+#	class AnimationMeta
+#	class AnimationObject(VRScript.Core.Behavior)
+
 import VRScript
 import JasperConfig
 import JasperEngine
 
 # Represents an audio.
+# Remarks: 
+#	This is a wrapper class that enhances audio functionality in VRScript. It 
+#	provides delayed loading (load when requested), fading, and distance-fade.
 class AudioObj(VRScript.Core.Behavior):
 	def __init__(self, name, file, loop=False, parent=None):
 		VRScript.Core.Behavior.__init__(self,name)
