@@ -45,7 +45,6 @@ class Paranormal(lel_common.GenericObject):
 	#		string captureCommand - command to catch this paranormal (default: CLICK)
 	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding, captureCommand="CLICK"):
 		lel_common.GenericObject.__init__(self, name, JasperConfig.MonstersDir + sMeshName, location, True, True, "Concave", True, "Static")
-		self.state = initState
 		self.discoverCommand = discoverCommand
 		self.captureCommand = captureCommand
 		self.type = "paranormal"
@@ -58,6 +57,13 @@ class Paranormal(lel_common.GenericObject):
 		self.capturedAnimPlaymode = VRScript.Core.PlayMode.Once
 		self.userDist = 0
 		self.userProxTrigger = -1
+		self.state = ParanormalState.Hiding
+		if (initState == ParanormalState.Discovered):
+			print("Init discover " + str(self))
+			self.Discover()
+		elif (initState == ParanormalState.Captured):
+			self.state == ParanormalState.Discovered
+			self.Capture()
 		print(self.name + " initialized. Current state=" + str(self.state))
 	
 	# Converts this Paranormal to a string.
@@ -198,7 +204,6 @@ class Paranormal(lel_common.GenericObject):
 	
 	def OnInit(self, cbInfo):
 		lel_common.GenericObject.OnInit(self, cbInfo)
-		# self.physical('').enableProximity(True)
 	
 	# Implements VRScript.Core.Behavior.OnUpdate.
 	def OnUpdate(self, cbInfo):
@@ -221,25 +226,15 @@ class Paranormal(lel_common.GenericObject):
 		print(str(self) + " is clicked.")
 		if ("CLICK" in self.captureCommand and btnInfo.button < 3):
 			self.AdvanceState()
-	
-	# Implements VRScript.Core.Behavior.OnProximity.
-	# def OnProximity(self,cbInfo, intInfo):
-		# if ("NEAR" in self.discoverCommand and self.state == ParanormalState.Hiding):
-			# if (intInfo.otherEntity.getName() == "User0" and intInfo.distance < 2):
-				# print(str(self) + " discovered by proximity.")
-				# self.AdvanceState()
-		# if (self.state == ParanormalState.Discovered):
-			# print (str(self) + ' is nearby object: ' + (intInfo.otherEntity.getName()) + ', distance{0}'.format(intInfo.distance))
-
-	
+		
 class Ghost(Paranormal):
 	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding, hoverDist=0.001, hoverSpeed=0.01):
-		Paranormal.__init__(self, name, sMeshName, location, discoverCommand, initState)
-		self.type = "ghost"
 		self.hover = -1
 		self.hoverDistance = hoverDist
 		self.hoverSpeed = hoverSpeed
 		self.shrinkCount = 0
+		Paranormal.__init__(self, name, sMeshName, location, discoverCommand, initState)
+		self.type = "ghost"
 		self.SetDiscoveredSound("moan.wav")
 		self.SetCapturedSound("scream1.wav")
 		self.SetUserProximityTrigger(4)
@@ -301,6 +296,11 @@ class GhostFlyaway(Ghost):
 			self.flyDistance *= 2
 		else:
 			self.renderable('').hide()
+
+class Lurcher(Paranormal):
+	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding):
+		Paranormal.__init__(self, name, sMeshName, location, discoverCommand, initState)
+		self.type = "lurcher"
 			
 class Crawler(Paranormal):
 	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding):

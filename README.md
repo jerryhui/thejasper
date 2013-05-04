@@ -9,6 +9,10 @@
 DEV LOG
 
 2013/05/04
+Finished:
+- Paranormals now detects User0 and trigges OnUserProximity()
+- Game stats text distance fix
+- Paranormal initial states now handled correctly
 
 2013/05/03
 Finished:
