@@ -8,9 +8,13 @@
 
 DEV LOG
 
+2013/05/04
+
 2013/05/03
 Finished:
 - Modularizing code to JasperEngine.py
+- Game stats text not showing up on DEV wall (fixed; head tracker was on backwards)
+- Sound will dim as user goes further away
 
 Problems:
-- Game stats text not showing up on DEV wall
+- OnProximity with user is on but position is not correct
