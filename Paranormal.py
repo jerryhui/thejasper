@@ -84,7 +84,13 @@ class Paranormal(lel_common.GenericObject):
 	#	pd - distance that will trigger event.
 	def SetUserProximityTrigger(self, pd):
 		self.userProxTrigger = pd
-		
+	
+	# Sets the flag for staring behavior.
+	# Input:
+	#	stare - set to True if paranormal should face user all the time
+	def SetStaring(self, stare):
+		self.isStaring = stare
+	
 	# Sets the animation file to play when this paranormal is discovered.
 	# Set this to None if a programmatic animation is to be used; implement DiscoveredAnimation()
 	# to provide programmatic animation.
@@ -244,6 +250,8 @@ class Paranormal(lel_common.GenericObject):
 		
 class Ghost(Paranormal):
 	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding, hoverDist=0.001, hoverSpeed=0.01):
+		# debug: must set defautl Ghost properties that are needed for Discovered or Captured,
+		# in case user wants initial state something other than Hiding
 		self.hover = -1
 		self.hoverDistance = hoverDist
 		self.hoverSpeed = hoverSpeed
