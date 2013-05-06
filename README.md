@@ -8,6 +8,8 @@ Created for DS501, Spring 2013
 
 DEV LOG
 
+## 2013/05/06
+
 ## 2013/05/04
 ### FINISHED
 - [x] *Paranormal* class now detects User0 and trigges _OnUserProximity()_

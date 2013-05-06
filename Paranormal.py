@@ -14,6 +14,7 @@ import random
 import time
 import JasperConfig
 import JasperEngine
+import weakref
 
 # Enumerates all possible states of a paranormal. See documentation for Paranormal for more.
 class ParanormalState:
@@ -214,19 +215,20 @@ class Paranormal(lel_common.GenericObject):
 	
 	# Implements VRScript.Core.Behavior.OnUpdate.
 	def OnUpdate(self, cbInfo):
-		if (self.isStaring):
-			# rotate to face user
-			um = JasperEngine.User.movable().getPose()
-			uazi = 0.0
-			elev = 0.0
-			roll = 0.0
-			um.getEuler(uazi, elev, roll)
-			uazi = (uazi+180) % 360
-			m = self.movable().getPose()			
-			sazi = 0.0
-			m.getEuler(sazi, elev, roll)
-			m.setEuler(uazi, elev, roll)
-			self.movable().setPose(m)
+		if (self.isStaring and self.state!=ParanormalState.Captured):
+			# rotate to face user			
+			pM = self.movable().selfToWorld()
+			pTrans = pM.getTranslation()
+			pM = VRScript.Math.Matrix()
+		
+			um = JasperEngine.User.movable().selfToWorld()
+			
+			ueu = um.getEuler()
+			peu = pM.getEuler()
+			pM = pM.postEuler(ueu.x, peu.y, peu.z)
+			
+			pM.setTranslation(pTrans)
+			self.movable().setPose(pM)
 		
 		if (self.userProxTrigger > 0):
 			# implements user distance checking
@@ -261,6 +263,7 @@ class Ghost(Paranormal):
 		self.SetDiscoveredSound("moan.wav")
 		self.SetCapturedSound("scream1.wav")
 		self.SetUserProximityTrigger(4)
+		self.SetStaring(True)
 		print("New ghost " + name + " created")
 	
 	def Discover(self):
