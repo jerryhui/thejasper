@@ -1,5 +1,6 @@
 # HouseObjects.py
 # Contains objects that have additional interactive behaviors.
+# class ProxTrigger(VRScript.Core.Behavior)
 #	class Door(lel_common.GenericObject)
 #	class BumpableObj(lel_common.GenericObject)
 
@@ -7,7 +8,48 @@ import VRScript
 import lel_common
 import Animation
 import JasperConfig
+import JasperEngine
 
+# A ProxTrigger will call a list of functions (no param) when user comes within a given range of parentObj.
+class ProxTrigger(VRScript.Core.Behavior):
+	def __init__(self, name, parentObj, userProxTrigger=4.99, actions=[], oneTimeTrigger=True, willReset=False):
+		VRScript.Core.Behavior.__init__(self, "Trigger_" + name)
+		self.actions = []
+		self.actions.extend(actions)
+		self.userProxTrigger = distance
+		self.userDist = -1
+		self.parentObj = parentObj
+		self.oneTimeTrigger = oneTimeTrigger	# set to True if trigger actions are run only once per distance breach
+		self.willReset = willReset		# set to True if trigger is reset when user gets out of range
+		self.triggerFired = False		# state of whether this trigger has been fired
+
+	# Calculates the distance between parent and User0.
+	# Returns:
+	#	(float) distance between parentObj and User0
+	def UserDistance(self):
+		m = self.parentObj.movable().getPose()					
+		uv = JasperEngine.User.movable().getPose().getTranslation()
+		sv = m.getTranslation()
+		d = uv-sv	
+		return d.length()
+		
+	def OnUpdate(self, cbInfo):
+		if (not self.triggerFired):
+			d = self.UserDistance()
+			if (self.userDist != d):
+				self.userDist = d
+				if (d <= self.userProxTrigger):
+					if (self.oneTimeTrigger):
+						self.triggerFired = True
+					for (act in self.actions):
+						act()
+		elif (self.willReset):
+				d = self.UserDistance()
+				if (self.userDist != d):
+					self.userDist = d
+					if (d > self.userProxTrigger):
+						self.triggerFired = False
+				
 # A Door instance is a door that will open and close when user approaches, with animation and audio.
 #		bool isOpen		- True if the object is the model of an open door
 #		float openAngle - the angle to turn in order to OPEN the door
