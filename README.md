@@ -9,6 +9,14 @@ Created for DS501, Spring 2013
 DEV LOG
 
 ## 2013/05/06
+### FINISHED
+- [x] *Paranormal* now has a staring option
+- [x] *Lurcher* (creature that moves forward) first implementation (not yet tested)
+- [x] *Door* extended so that groups of doors (usually double doors) can be opened/closed at the same time
+
+### TO Do
+- [ ] *Lurcher* test
+- [ ] *Crawler* (creature moves using Physics engine)
 
 ## 2013/05/04
 ### FINISHED
@@ -18,8 +26,6 @@ DEV LOG
 
 ### TO DO
 - [ ] *Paranormal* rotation
-- [ ] *Crawler* (creature moves using Physics engine)
-- [ ] *Lurcher* (creature that moves forward)
 
 ## 2013/05/03
 ### FINISHED
