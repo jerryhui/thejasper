@@ -16,7 +16,8 @@ class AudioObj(VRScript.Core.Behavior):
 	def __init__(self, name, file, loop=False, parent=None):
 		VRScript.Core.Behavior.__init__(self,name)
 		self.name = name
-		self.file = JasperConfig.MusicDir + file
+		self.file = ""
+		self.SetFile(file)
 		self.loop = loop
 		self.audible = None
 		self.fadingDir = 0		# >0: fade in; <0: fade out
@@ -30,6 +31,16 @@ class AudioObj(VRScript.Core.Behavior):
 	def __str__(self):
 		return self.name
 	
+	# Sets the audio file.
+	# Inputs:
+	#	file - path and name of audio file
+	#	prefix (OPT) - prefix to file path (default=JasperConfig.MusicDir)
+	def SetFile(self, file, prefix=JasperConfig.MusicDir):
+		self.file = prefix + file
+	
+	# Attaches this AudioObj to an object in the scene for distance decay.
+	# Input:
+	#	parent - parent object from which this sound eminates
 	def SetParent(self,parent):
 		self.parent = parent
 	
