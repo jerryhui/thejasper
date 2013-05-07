@@ -41,7 +41,7 @@ class ProxTrigger(VRScript.Core.Behavior):
 				if (d <= self.userProxTrigger):
 					if (self.oneTimeTrigger):
 						self.triggerFired = True
-					for (act in self.actions):
+					for act in self.actions:
 						act()
 		elif (self.willReset):
 				d = self.UserDistance()
@@ -154,12 +154,14 @@ class Door(lel_common.GenericObject):
 				
 class BumpableObj(lel_common.GenericObject):
 	def __init__(self,sName, sMeshName, position):
-		lel_common.GenericObject.__init__(self, sName, sMeshName, position, True, True, "Concave", True, "Kinematic")
+		lel_common.GenericObject.__init__(self, sName, sMeshName, position, True, True, "Concave", True, "Dynamic")
 		self.bumpedSound = None
 		
 	def SetBumpedSound(self,file):
-		self.bumpedSound = Animation.AudioObj(sName + "_BumpedSound", file)
+		self.bumpedSound = Animation.AudioObj(self.name + "_BumpedSound", file, False)
 		
-	def OnCollision(self,cbInfo):
-		if (type(self.bumpedSound) is Animation.AudioObj):
+	def OnCollision(self,cbInfo,intInfo):
+		print(self.name + ".OnCollision()")
+		if (self.bumpedSound is not None):
+			print(self.name + "sound.Play()")
 			self.bumpedSound.Play()

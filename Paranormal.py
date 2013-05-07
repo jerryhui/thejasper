@@ -238,7 +238,7 @@ class Paranormal(lel_common.GenericObject):
 				self.userDist = d
 				if (d <= self.userProxTrigger):
 					self.OnUserProximity()
-					print("{0}.userDist={1}".format(self,d))
+					# print("{0}.userDist={1}".format(self,d))
 		if (self.state == ParanormalState.Discovered):
 			self.IdleAnimation()
 		elif (self.state == ParanormalState.Captured):
