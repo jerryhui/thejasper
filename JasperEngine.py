@@ -82,11 +82,12 @@ class EnvObject(VRScript.Core.Behavior):
 			aud = self.bkgMusic[self.bkgMusicIndex].GetAudible()
 			if (aud is None):
 				aud = self.bkgMusic[self.bkgMusicIndex].MakeAudible()
+				aud.SetGain(0.75)
 			if (not aud.isPlaying()):
 				self.bkgMusicIndex = (self.bkgMusicIndex+1) % len(self.bkgMusic)
 				print("Advance bkgMusicIndex to " + str(self.bkgMusicIndex))
 				# self.bkgMusic[self.bkgMusicIndex].play()
-				self.bkgMusic[self.bkgMusicIndex].Play(True,1.05)
+				self.bkgMusic[self.bkgMusicIndex].Play(True,1.025)
 
 # Represents the game engine of The Jasper.
 #	Paranormals[] paranormals - list of paranormals in this scene
@@ -151,3 +152,16 @@ class HauntedHouseEngine(lel_common.LELScenario):
 	def AddMusic(self,file):
 		print("DEBUG: HauntedHouse.AddMusic()")
 		self.env.AddMusic(file)
+		
+	def CreateGround(self):
+		ground = VRScript.Core.Behavior("GroundPlane")
+		ground_plane = VRScript.Resources.Box(VRScript.Math.Vector(50,50,.25), VRScript.Math.Point(0,0,-.25))
+		ground.attach(VRScript.Core.Renderable("GroundPlaneRender", ground_plane))
+		
+		p = VRScript.Core.Physical("GroundPlanePhysics",ground_plane)
+		pprop = VRScript.Core.PhysicsProperties(0, .0, 1, 1, .5)
+		p.setPhysicsProperties(pprop)
+		p.setCollisionType(VRScript.Core.CollisionType.Static)
+		ground.attach(p)
+		ground.renderable('').show()
+		ground.movable().setPose(VRScript.Math.Matrix())

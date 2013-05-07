@@ -214,22 +214,25 @@ class Paranormal(lel_common.GenericObject):
 	def OnInit(self, cbInfo):
 		lel_common.GenericObject.OnInit(self, cbInfo)
 	
+	def StareAtUser(self):
+		pM = self.movable().selfToWorld()
+		pTrans = pM.getTranslation()
+		pM = VRScript.Math.Matrix()
+	
+		um = JasperEngine.User.movable().selfToWorld()
+		
+		ueu = um.getEuler()
+		peu = pM.getEuler()
+		pM = pM.postEuler(ueu.x, peu.y, peu.z)
+		
+		pM.setTranslation(pTrans)
+		self.movable().setPose(pM)
+	
 	# Implements VRScript.Core.Behavior.OnUpdate.
 	def OnUpdate(self, cbInfo):
 		if (self.isStaring and self.state!=ParanormalState.Captured):
-			# rotate to face user			
-			pM = self.movable().selfToWorld()
-			pTrans = pM.getTranslation()
-			pM = VRScript.Math.Matrix()
-		
-			um = JasperEngine.User.movable().selfToWorld()
-			
-			ueu = um.getEuler()
-			peu = pM.getEuler()
-			pM = pM.postEuler(ueu.x, peu.y, peu.z)
-			
-			pM.setTranslation(pTrans)
-			self.movable().setPose(pM)
+			# rotate to face user
+			self.StareAtUser()
 		
 		if (self.userProxTrigger > 0):
 			# implements user distance checking
@@ -330,25 +333,36 @@ class Lurcher(Paranormal):
 		Paranormal.__init__(self, name, sMeshName, location, discoverCommand, initState)
 		self.type = "lurcher"
 		self.SetStaring(True)
+		self.physicsValues = [3.0, 0.9, 0.995, 1, 0.5]
+		print("{0} created.".format(self))
 
-	def OnInit(self,cbInfo):
-		Paranormal.OnInit(self,cbInfo)
-		p = self.physical('')
-		pProp = VRScript.Core.PhysicsProperties(1,1,.99,.99,.5)
-		self.physical('').setPhysicsProperties(pProp)
+	# def OnInit(self,cbInfo):
+		# Paranormal.OnInit(self,cbInfo)
 		
 	# Lurcher always moves toward player when idle.
-	def IdleAnimation(self):
-		m = self.movable().selfToWorld()
-		mTrans = m.getTranslation()
-		m = m.setTranslation(VRScript.Math.Vector(0,0,0))
+	def OnUpdate(self, cbInfo):
+		if (cbInfo.frameCount % 2):
+			if (self.isStaring and self.state!=ParanormalState.Captured):
+				# rotate to face user
+				self.StareAtUser()
+		else:	
+			# move towards user using Physics
+			m = self.movable().entityToSelf('User0')
+			
+			vBackToFront = VRScript.Math.Vector(0,-1,0)
+			vBackToFront = m.transform(vBackToFront)
+			vBackToFront.z = 0
+			vBackToFront = vBackToFront.normalize()
+			vBackToFront = vBackToFront * 0.2
+			print("vBackToFront {0},{1},{2}".format(vBackToFront.x, vBackToFront.y, vBackToFront.z))
+			
+			p = self.physical()
+			p.setCollisionType(VRScript.Core.CollisionType.Dynamic)
+			p.applyImpulse(vBackToFront, VRScript.Math.Vector(0,0,0))
 		
-		vBackToFront = VRScript.Math.Vector(0,-1,0)
-		vBackToFront = m.transform(vBackToFront)
-		
-		p = self.physical('')
-		p.setCollisionType(VRScript.Core.CollisionType.Dynamic)
-		p.applyImpulse(vBackToFront, VRScript.Math.Vector(0,0,0))
+
+		if (self.state == ParanormalState.Captured):
+			self.CapturedAnimation()
 			
 class Crawler(Paranormal):
 	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding):

@@ -156,12 +156,34 @@ class BumpableObj(lel_common.GenericObject):
 	def __init__(self,sName, sMeshName, position):
 		lel_common.GenericObject.__init__(self, sName, sMeshName, position, True, True, "Concave", True, "Dynamic")
 		self.bumpedSound = None
+		self.physicsValues = [2.0, 0.25, 0.9, 1, 0.5]
 		
 	def SetBumpedSound(self,file):
 		self.bumpedSound = Animation.AudioObj(self.name + "_BumpedSound", file, False)
+	
+	def OnButtonRelease(self,cbInfo,btnInfo,user):
+		print(self.name + ".OnButtonRelease()")
+		m = self.movable().entityToSelf('User0')
 		
+		vBackToFront = VRScript.Math.Vector(0,1,0)
+		vBackToFront = m.transform(vBackToFront)
+		
+		p = self.physical('')
+		p.setCollisionType(VRScript.Core.CollisionType.Dynamic)
+		p.applyImpulse(vBackToFront, VRScript.Math.Vector(0,0,0))
+	
 	def OnCollision(self,cbInfo,intInfo):
-		print(self.name + ".OnCollision()")
-		if (self.bumpedSound is not None):
-			print(self.name + "sound.Play()")
-			self.bumpedSound.Play()
+		if (intInfo.otherEntity.getName() != "GroundPlane"):
+			print(self.name + ".OnCollision() with " + intInfo.otherEntity.getName())
+			m = self.movable().entityToSelf('User0')
+			
+			vBackToFront = VRScript.Math.Vector(0,1,0)
+			vBackToFront = m.transform(vBackToFront)
+			
+			p = self.physical('')
+			p.setCollisionType(VRScript.Core.CollisionType.Dynamic)
+			p.applyImpulse(vBackToFront, VRScript.Math.Vector(0,0,0))
+		
+			if (self.bumpedSound is not None):
+				print(self.name + "sound.Play()")
+				self.bumpedSound.Play()

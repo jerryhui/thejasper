@@ -1,5 +1,5 @@
 Models\*
-Music\lux.wav
+AudioFiles\ligeti-*.wav
 Animations\*
 *.fbx
 *.pyc
