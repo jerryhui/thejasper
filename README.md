@@ -10,20 +10,20 @@ TASK LIST
 =========
 ## MUST DO
 - [ ] *BumpableObj* gets kicked when interacting
-- [ ] *EnvObject* lower stats text only when changes occur
 - [ ] *Lurcher* test
 
 ## NICE TO HAVE
 - [ ] *Crawler* (creature moves randomly using Physics engine)
-- [ ] *Door* objects opened by physics engine
 
 ## PIPE DREAM
 - [ ] Wiimote/Kinect controls
+- [ ] *Door* objects opened by physics engine
 
 DEV LOG
 =======
 ## 2013/05/17
 - [x] Load baked model for view plus simple model for physics
+- [x] *EnvObject* now fades in/out status text
 
 ## 2013/05/06
 - [x] *Paranormal* now has a staring option

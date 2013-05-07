@@ -22,12 +22,15 @@ class EnvObject(VRScript.Core.Behavior):
 		self.bkgMusicFiles = []	# list of music files
 		self.bkgMusicIndex = 0	# points to current background music
 		self.name = "JasperEnvironment"
+		self.textAlpha = 1
+		self.textStep = 0
+		self.textHold = 1000
 	
 	# Initializes all stats.
 	def OnInit(self,cbInfo):
 		# create score text
 		self.scoreText = VRScript.Core.FontText('Score', 'You have caught {0} out of {1} ghosts'.format(self.paranormalCaptured,self.paranormalTotal))
-		self.scoreText.setColor(VRScript.Core.Color(1,1,0))
+		self.scoreText.setColor(VRScript.Core.Color(1,1,0,self.textAlpha))
 		self.scoreText.setHeight(.05)
 		self.scoreText.show()
 		self.attach(self.scoreText)
@@ -72,11 +75,33 @@ class EnvObject(VRScript.Core.Behavior):
 	
 	# Updates game stats. Perform rendering update ONLY when there's an actual change.
 	def OnUpdate(self, cbInfo):
+		# fade in/out text or hold
+		if (self.textHold > 0):
+			self.textHold -= 1
+		elif (self.textHold ==0):
+			self.textStep = -.001
+		
+		if (self.textStep != 0):
+			self.textAlpha += self.textStep
+			if (self.textStep>0 and self.textAlpha >= 0.9):
+				self.textAlpha = 1
+				self.textHold = 2500
+				self.textStep = 0
+				print("Stop fade in")
+			elif (self.textStep<0 and self.textAlpha <= 0.1):
+				self.textAlpha = 0
+				self.textHold = -99
+				self.textStep = 0
+				print("Stop fade out")
+			self.scoreText.setColor(VRScript.Core.Color(1,1,0,self.textAlpha))
+
 		# check/update score text
 		n = self.house.CapturedParanormalCount()
 		if (n != self.paranormalCaptured):
 			self.SetCaptured(n)
-			
+			print("Begin fade in text")
+			self.textStep = 0.001
+				
 		# check/advance background music
 		if (self.bkgMusicIndex < len(self.bkgMusic)):
 			aud = self.bkgMusic[self.bkgMusicIndex].GetAudible()
