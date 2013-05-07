@@ -4,6 +4,7 @@
 #	class Paranormal(lel_common.GenericObject)
 #	class Ghost(Paranormal)
 #	class GhostFlyaway(Ghost)
+# class Lurcher(Paranormal)
 #	class Crawler(Paranormal)
 
 import VRScript
@@ -328,6 +329,26 @@ class Lurcher(Paranormal):
 	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding):
 		Paranormal.__init__(self, name, sMeshName, location, discoverCommand, initState)
 		self.type = "lurcher"
+		self.SetStaring(True)
+
+	def OnInit(self,cbInfo):
+		Paranormal.OnInit(self,cbInfo)
+		p = self.physical('')
+		pProp = VRScript.Core.PhysicsProperties(1,1,.99,.99,.5)
+		self.physical('').setPhysicsProperties(pProp)
+		
+	# Lurcher always moves toward player when idle.
+	def IdleAnimation(self):
+		m = self.movable().selfToWorld()
+		mTrans = m.getTranslation()
+		m = m.setTranslation(VRScript.Math.Vector(0,0,0))
+		
+		vBackToFront = VRScript.Math.Vector(0,-1,0)
+		vBackToFront = m.transform(vBackToFront)
+		
+		p = self.physical('')
+		p.setCollisionType(VRScript.Core.CollisionType.Dynamic)
+		p.applyImpulse(vBackToFront, VRScript.Math.Vector(0,0,0))
 			
 class Crawler(Paranormal):
 	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding):
