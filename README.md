@@ -24,6 +24,7 @@ DEV LOG
 ## 2013/05/17
 - [x] Load baked model for view plus simple model for physics
 - [x] *EnvObject* now fades in/out status text
+- [x] *Door* slaves tested
 
 ## 2013/05/06
 - [x] *Paranormal* now has a staring option

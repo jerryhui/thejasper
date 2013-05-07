@@ -81,9 +81,10 @@ class Door(lel_common.GenericObject):
 	def AddSlaveDoor(self,door):
 		if (type(door) is not Door): return
 		door.slaveDoors = []
-		slaveDoors.append(door)
+		self.slaveDoors.append(door)
 		door.masterDoorPtr = self
 		self.masterDoorPtr = None
+		print("Added {0} as slave to {1}".format(door.name, self.name))
 
 	# Sets the sound effect to the opening and closing of this door.
 	# Input:
@@ -106,13 +107,14 @@ class Door(lel_common.GenericObject):
 	# Opens this door.
 	# Input:
 	#	skipSlave(OPT) - for internal use only: do not check/open slave doors.
-	def Open(self, skipSlave=False):
-		if (self.masterDoorPtr is None):
+	#	justOpen(OPT) - just open this door without checking master/slave; necessary to stop recursion
+	def Open(self, skipSlave=False, justOpen=False):
+		if (justOpen or self.masterDoorPtr is None):
 			# this is a master door
 			print("Open door " + self.name)
 			self.Rotate(self.openAngle,0,0)
 			self.isOpen = True
-			if (not skipSlave):
+			if (justOpen or not skipSlave):
 				self.SetAllDoors()
 		else:
 			self.masterDoorPtr.Open()
@@ -120,12 +122,13 @@ class Door(lel_common.GenericObject):
 	# Closes this door.
 	# Input:
 	#	skipSlave(OPT) - for internal use only: do not check/close slave doors.
-	def Close(self, skipSlave=False):
-		if (self.masterDoorPtr is None):
+	#	justClose(OPT) - just close this door without checking master/slave; necessary to stop recursion
+	def Close(self, skipSlave=False, justClose=False):
+		if (justClose or self.masterDoorPtr is None):
 			print("Close door " + self.name)
 			self.Rotate(self.openAngle*-1,0,0)
 			self.isOpen = False
-			if (not skipSlave):
+			if (justClose or not skipSlave):
 				self.SetAllDoors()
 		else:
 			self.masterDoorPtr.Close()
@@ -135,9 +138,9 @@ class Door(lel_common.GenericObject):
 		for slaveDoor in self.slaveDoors:
 			if (self.isOpen != slaveDoor.isOpen):
 				if (self.isOpen): 
-					slaveDoor.Open(True)
+					slaveDoor.Open(True,True)
 				else:
-					slaveDoor.Close(True)
+					slaveDoor.Close(True,True)
 	
 	def OnUpdate(self, cbInfo):
 		lel_common.GenericObject.OnUpdate(self, cbInfo)
@@ -154,7 +157,7 @@ class Door(lel_common.GenericObject):
 				
 class BumpableObj(lel_common.GenericObject):
 	def __init__(self,sName, sMeshName, position):
-		lel_common.GenericObject.__init__(self, sName, sMeshName, position, True, True, "Concave", True, "Dynamic")
+		lel_common.GenericObject.__init__(self, sName, JasperConfig.ModelsDir + sMeshName, position, True, True, "Concave", True, "Dynamic")
 		self.bumpedSound = None
 		self.physicsValues = [2.0, 0.25, 0.9, 1, 0.5]
 		
