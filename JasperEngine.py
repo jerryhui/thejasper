@@ -69,9 +69,9 @@ class EnvObject(VRScript.Core.Behavior):
 	def AddMusic(self,file):
 		if (file not in self.bkgMusicFiles):
 			self.bkgMusicFiles.append(file)
-			print("Added {0} to bkgMusic; total music count={1}".format(file, len(self.bkgMusicFiles)))
-		else:
-			print("DEBUG: music {0} not added".format(file))
+			# print("Added {0} to bkgMusic; total music count={1}".format(file, len(self.bkgMusicFiles)))
+		# else:
+			# print("DEBUG: music {0} not added".format(file))
 	
 	# Updates game stats. Perform rendering update ONLY when there's an actual change.
 	def OnUpdate(self, cbInfo):
@@ -113,7 +113,7 @@ class EnvObject(VRScript.Core.Behavior):
 				print("Advance bkgMusicIndex to " + str(self.bkgMusicIndex))
 				# self.bkgMusic[self.bkgMusicIndex].play()
 				self.bkgMusic[self.bkgMusicIndex].Play(True,1.025)
-
+	
 # Represents the game engine of The Jasper.
 #	Paranormals[] paranormals - list of paranormals in this scene
 #	user - User0 entity

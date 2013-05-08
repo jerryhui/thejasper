@@ -154,7 +154,33 @@ class Door(lel_common.GenericObject):
 				self.Close()
 			else:
 				self.Open()
-				
+
+# class ScalableObj(lel_common.GenericObject):
+	# def __init__(self, sName, sMeshName, position, bVis, bPhysics, physicsShape, interact, physicsType, prescale):
+		# lel_common.GenericObject.__init__(self, sName, sMeshName, position, bVis, bPhysics, physicsShape, interact, physicsType)
+		# self.scaling = prescale
+		# # self.prerotate = prerotate
+		# print(sName + ".__init__()")
+		
+	# def OnInit(self, cbInfo):
+		# m = self.movable().getPose()
+		# m = m.preScale(VRScript.Math.Vector(self.scaling[0], self.scaling[1], self.scaling[2]))
+		# self.movable().setPose(m)
+		# print(self.name + ".OnInit()")
+
+class ScalableObj(VRScript.Core.Behavior):
+	def __init__(self, sName, sMeshName, position, bVis, bPhysics, physicsShape, interact, physicsType, prescale):
+		print(sName + ".__init__()")
+		VRScript.Core.Behavior.__init__(self, sName+"wrapper")
+		self.obj = lel_common.GenericObject(sName, sMeshName, position, bVis, bPhysics, physicsShape, interact, physicsType)
+		self.preScale = prescale
+		
+	def OnInit(self, cbInfo):
+		m = self.obj.movable().getPose()
+		m = m.postScale(VRScript.Math.Vector(self.preScale[0], self.preScale[1], self.preScale[2]))
+		print(self.obj.name + "OnInit() scale to [{0},{1},{2}]".format(self.preScale[0], self.preScale[1], self.preScale[2]))
+		self.obj.movable().setPose(m)
+		
 class BumpableObj(lel_common.GenericObject):
 	def __init__(self,sName, sMeshName, position):
 		lel_common.GenericObject.__init__(self, sName, JasperConfig.ModelsDir + sMeshName, position, True, True, "Concave", True, "Dynamic")

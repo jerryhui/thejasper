@@ -10,15 +10,20 @@ from JasperEngine import *
 
 theJasper = HauntedHouseEngine()
 
-theJasper.create_entity("fullHouse", "Models\\final.ive", [-11.965188452524,-8.30300893997043,0], True, False, "Concave", False, "Static")
-theJasper.create_entity("landscape", "Models\\Landscape\\landscape.ive", [0,0,0], True, False, "Concave", False, "Static")
-theJasper.create_entity("simpleHouse", "Models\\simpleHouse.ive", [-11.965188452524,-8.30300893997043,0], False, True, "Concave", False, "Static")
-# theJasper.create_entity("stairs", "Models\\stairs.osg", [-1.84537044421864,2.88498266908194,0.549046263677154], False, True, "Concave", False, "Static")
-# theJasper.create_entity("secFloorBoard", "Models\\secFloorBoard.ive", [-11.8793173885138,-5.34976169646222,4.66189630735589], True, True, "Box", False, "Static")
-theJasper.create_ground_plane()
+houseCoord = [-12.7, 2.25, 0]
+landscapeCoord = [ houseCoord[0]-18.36, houseCoord[1]-30.47, 0]
+theJasper.create_entity("fullHouse", "Models\\final.ive", houseCoord, True, False, "Concave", False, "Static")
+theJasper.create_entity("simpleHouse", "Models\\simpleHouse.ive", houseCoord, False, True, "Concave", False, "Static")
+theJasper.AddObject( HouseObjects.ScalableObj("landscape", "Models\\Landscape\\landscape.ive", landscapeCoord, True, False, "Concave", False, "Static", [0.3048,0.3048,0.3048]))
 
 ghostMan = theJasper.AddParanormal(Paranormal.Ghost("ghostMan", "ghostman.ive", [0,0,0], "LOOK"))
 # ghostMan = theJasper.AddParanormal(Paranormal.GhostFlyaway("ghostManFlyaway", "ghostman.ive", [-1,-2,0], "LOOK"))
 
-theJasper.AddMusic("lux.wav")
-VRScript.Interaction.setJumpPoint(0,VRScript.Math.Matrix().setTranslation(VRScript.Math.Vector(-5,-4,0.52115)))
+chair = theJasper.AddObject(HouseObjects.BumpableObj("chair1", "Furniture\\chair001.ive",[1,1,0]))
+chair.SetBumpedSound("ChairKick.wav")
+chair = theJasper.AddObject(HouseObjects.BumpableObj("chair2", "Furniture\\chair001.ive",[1,3,0]))
+chair.SetBumpedSound("ChairKick.wav")
+
+theJasper.AddMusic("ligeti-atmospheres.wav")
+theJasper.AddMusic("ligeti-lux.wav")
+# VRScript.Interaction.setJumpPoint(0,VRScript.Math.Matrix().setTranslation(VRScript.Math.Vector(-5,-4,0.52115)))

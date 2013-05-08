@@ -9,7 +9,9 @@ Created for DS501, Spring 2013
 TASK LIST
 =========
 ## MUST DO
-- [ ] *BumpableObj* gets kicked when interacting
+- [ ] landscape location
+- [ ] self-close main doors behind user
+- [ ] put in doors and interactive objects
 - [ ] *Lurcher* test
 
 ## NICE TO HAVE
@@ -24,7 +26,9 @@ DEV LOG
 ## 2013/05/17
 - [x] Load baked model for view plus simple model for physics
 - [x] *EnvObject* now fades in/out status text
+- [x] *BumpableObj* gets kicked when interacting
 - [x] *Door* slaves tested
+- [x] check physics/model line-up
 
 ## 2013/05/06
 - [x] *Paranormal* now has a staring option
