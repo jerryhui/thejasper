@@ -156,17 +156,17 @@ class Door(lel_common.GenericObject):
 				self.Open()
 
 # class ScalableObj(lel_common.GenericObject):
-	# def __init__(self, sName, sMeshName, position, bVis, bPhysics, physicsShape, interact, physicsType, prescale):
-		# lel_common.GenericObject.__init__(self, sName, sMeshName, position, bVis, bPhysics, physicsShape, interact, physicsType)
-		# self.scaling = prescale
-		# # self.prerotate = prerotate
-		# print(sName + ".__init__()")
-		
-	# def OnInit(self, cbInfo):
-		# m = self.movable().getPose()
-		# m = m.preScale(VRScript.Math.Vector(self.scaling[0], self.scaling[1], self.scaling[2]))
-		# self.movable().setPose(m)
-		# print(self.name + ".OnInit()")
+# 	def __init__(self, sName, sMeshName, position, bVis, bPhysics, physicsShape, interact, physicsType, prescale):
+# 		lel_common.GenericObject.__init__(self, sName, sMeshName, position, bVis, bPhysics, physicsShape, interact, physicsType)
+# 		self.scaling = prescale
+# 		# self.prerotate = prerotate
+# 		print(sName + ".__init__()")
+# 		
+# 	def OnInit(self, cbInfo):
+# 		m = self.movable().getPose()
+# 		m = m.preScale(VRScript.Math.Vector(self.scaling[0], self.scaling[1], self.scaling[2]))
+# 		self.movable().setPose(m)
+# 		print(self.name + ".OnInit()")
 
 class ScalableObj(VRScript.Core.Behavior):
 	def __init__(self, sName, sMeshName, position, bVis, bPhysics, physicsShape, interact, physicsType, prescale):
@@ -182,9 +182,11 @@ class ScalableObj(VRScript.Core.Behavior):
 		self.obj.movable().setPose(m)
 		
 class BumpableObj(lel_common.GenericObject):
-	def __init__(self,sName, sMeshName, position):
+	def __init__(self,sName, sMeshName, position, bSound=None):
 		lel_common.GenericObject.__init__(self, sName, JasperConfig.ModelsDir + sMeshName, position, True, True, "Concave", True, "Dynamic")
 		self.bumpedSound = None
+		if (type(bSound) is str):
+			self.SetBumpedSound(bSound)
 		self.physicsValues = [2.0, 0.25, 0.9, 1, 0.5]
 		
 	def SetBumpedSound(self,file):
