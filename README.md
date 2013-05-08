@@ -9,12 +9,12 @@ Created for DS501, Spring 2013
 TASK LIST
 =========
 ## MUST DO
-- [ ] landscape location
-- [ ] self-close main doors behind user
 - [ ] put in doors and interactive objects
-- [ ] *Lurcher* test
+- [ ] *Lurcher* test (adding Physical().zeroMotion())
+- [ ] landscape location; might be fixed through rebake in meter
 
 ## NICE TO HAVE
+- [ ] self-close main doors behind user
 - [ ] *Crawler* (creature moves randomly using Physics engine)
 
 ## PIPE DREAM
