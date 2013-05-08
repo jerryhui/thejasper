@@ -334,6 +334,7 @@ class Lurcher(Paranormal):
 		self.type = "lurcher"
 		self.SetStaring(True)
 		self.physicsValues = [3.0, 0.9, 0.995, 1, 0.5]
+		self.lastVec = None
 		print("{0} created.".format(self))
 
 	# def OnInit(self,cbInfo):
@@ -354,12 +355,17 @@ class Lurcher(Paranormal):
 			vBackToFront.z = 0
 			vBackToFront = vBackToFront.normalize()
 			vBackToFront = vBackToFront * 0.2
-			print("vBackToFront {0},{1},{2}".format(vBackToFront.x, vBackToFront.y, vBackToFront.z))
+			# print("vBackToFront {0},{1},{2}".format(vBackToFront.x, vBackToFront.y, vBackToFront.z))
 			
 			p = self.physical()
 			p.setCollisionType(VRScript.Core.CollisionType.Dynamic)
+			
+			# attempt to stop this Lurcher in its track if angle changes
+			if (vBackToFront != self.lastVec):
+				p.zeroMotion()
+				self.lastVec = vBackToFront	
+			
 			p.applyImpulse(vBackToFront, VRScript.Math.Vector(0,0,0))
-		
 
 		if (self.state == ParanormalState.Captured):
 			self.CapturedAnimation()
