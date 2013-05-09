@@ -215,18 +215,44 @@ class Paranormal(lel_common.GenericObject):
 		lel_common.GenericObject.OnInit(self, cbInfo)
 	
 	def StareAtUser(self):
-		pM = self.movable().selfToWorld()
+		pM = self.movable().entityToSelf('User0')
+		uM = JasperEngine.User.movable().entityToSelf(self.name)
+		
 		pTrans = pM.getTranslation()
-		pM = VRScript.Math.Matrix()
-	
-		um = JasperEngine.User.movable().selfToWorld()
+		uTrans = uM.getTranslation()
 		
-		ueu = um.getEuler()
-		peu = pM.getEuler()
-		pM = pM.postEuler(ueu.x, peu.y, peu.z)
+		dotProd = pTrans.dot(uTrans)
+		lengthProd = pTrans.length() * uTrans.length()
+		cosVal = dotProd/lengthProd
+		cosVal = min(1, max(-1, cosVal))	# clamp val to [-1,1]
+		# print("{0}/{1} = {2}".format(dotProd, lengthProd, cosVal))
+		angle = math.degrees(math.acos(-cosVal))
+
+		pM = self.movable().getPose()
+		pTrans = pM.getTranslation()
 		
+		if (math.floor(angle)>0):
+			pM = pM.postAxisAngle(-1, VRScript.Math.Vector(0, 0, 1))
+			print("{0} at angle {1} with user".format(self,angle))
 		pM.setTranslation(pTrans)
 		self.movable().setPose(pM)
+
+		
+		# pM = self.movable().selfToWorld()
+		# pTrans = pM.getTranslation()
+		# # pM = VRScript.Math.Matrix()
+	
+		# um = JasperEngine.User.movable().selfToWorld()
+		
+		# ueu = um.getEuler()
+		# peu = pM.getEuler()
+		# if (ueu.x - peu.x > 0):
+			# pM = pM.postEuler(1, peu.y, peu.z)
+		# else:
+			# pM = pM.postEuler(-1, peu.y, peu.z)
+		
+		# pM.setTranslation(pTrans)
+		# self.movable().setPose(pM)
 	
 	# Implements VRScript.Core.Behavior.OnUpdate.
 	def OnUpdate(self, cbInfo):
@@ -334,7 +360,7 @@ class Lurcher(Paranormal):
 		self.type = "lurcher"
 		self.SetStaring(True)
 		self.physicsValues = [3.0, 0.9, 0.995, 1, 0.5]
-		self.lastVec = None
+		self.lastVec = VRScript.Math.Vector(0,0,0)
 		print("{0} created.".format(self))
 
 	# def OnInit(self,cbInfo):
@@ -342,30 +368,32 @@ class Lurcher(Paranormal):
 		
 	# Lurcher always moves toward player when idle.
 	def OnUpdate(self, cbInfo):
-		if (cbInfo.frameCount % 2):
-			if (self.isStaring and self.state!=ParanormalState.Captured):
-				# rotate to face user
-				self.StareAtUser()
-		else:	
-			# move towards user using Physics
-			m = self.movable().entityToSelf('User0')
+		# if (cbInfo.frameCount % 5):
+		if (self.isStaring and self.state!=ParanormalState.Captured):
+			# rotate to face user
+			self.StareAtUser()
+		# else:	
+			# # move towards user using Physics
+			# # m = self.movable().selfToEntity('User0')
+			# m = self.movable().selfToWorld()
 			
-			vBackToFront = VRScript.Math.Vector(0,-1,0)
-			vBackToFront = m.transform(vBackToFront)
-			vBackToFront.z = 0
-			vBackToFront = vBackToFront.normalize()
-			vBackToFront = vBackToFront * 0.2
-			# print("vBackToFront {0},{1},{2}".format(vBackToFront.x, vBackToFront.y, vBackToFront.z))
+			# vBackToFront = VRScript.Math.Vector(0,-1,0)
+			# vBackToFront = m.transform(vBackToFront)
+			# vBackToFront = vBackToFront.normalize()
+			# vBackToFront = vBackToFront * 0.2
+			# vBackToFront.z = 0
 			
-			p = self.physical()
-			p.setCollisionType(VRScript.Core.CollisionType.Dynamic)
+			# p = self.physical()
+			# p.setCollisionType(VRScript.Core.CollisionType.Dynamic)
 			
-			# attempt to stop this Lurcher in its track if angle changes
-			if (vBackToFront != self.lastVec):
-				p.zeroMotion()
-				self.lastVec = vBackToFront	
+			# # attempt to stop this Lurcher in its track if angle changes
+			# if (vBackToFront != self.lastVec):
+				# print("vBackToFront {0},{1},{2}".format(vBackToFront.x, vBackToFront.y, vBackToFront.z))
+				# self.lastVec = vBackToFront
+				# # if (cbInfo.frameCount % 5 == 0):
+					# # p.zeroMotion()
 			
-			p.applyImpulse(vBackToFront, VRScript.Math.Vector(0,0,0))
+			# p.applyImpulse(vBackToFront, VRScript.Math.Vector(0,0,0))
 
 		if (self.state == ParanormalState.Captured):
 			self.CapturedAnimation()
@@ -385,14 +413,34 @@ class Crawler(Paranormal):
 		pProp = VRScript.Core.PhysicsProperties(1,1,.99,.99,.5)
 		self.physical('').setPhysicsProperties(pProp)
 	
-	def IdleAnimation(self):
-		# Crawl around
-		if (self.crawlDistance > 0):
-			print("{0} crawlDistance={1}".format(self,self.crawlDistance))
-			p = self.physical('')
-			p.setCollisionType(VRScript.Core.CollisionType.Dynamic)
-			p.applyImpulse(VRScript.Math.Vector(0.5,0,1), VRScript.Math.Vector(0,0,0))
-			self.crawlDistance -= 1
-		else:
-			self.crawlDistance = 0
+	# Lurcher always moves toward player when idle.
+	def OnUpdate(self, cbInfo):
+		if (cbInfo.frameCount % 5):
+			if (self.isStaring and self.state!=ParanormalState.Captured):
+				# rotate to face user
+				self.StareAtUser()
+		else:	
+			# move towards user using Physics
+			# m = self.movable().selfToEntity('User0')
+			m = self.movable().selfToWorld()
 			
+			vBackToFront = VRScript.Math.Vector(0,-1,0)
+			vBackToFront = m.transform(vBackToFront)
+			vBackToFront = vBackToFront.normalize()
+			vBackToFront = vBackToFront * 0.2
+			vBackToFront.z = 0
+			
+			p = self.physical()
+			p.setCollisionType(VRScript.Core.CollisionType.Dynamic)
+			
+			# attempt to stop this Lurcher in its track if angle changes
+			if (vBackToFront != self.lastVec):
+				print("vBackToFront {0},{1},{2}".format(vBackToFront.x, vBackToFront.y, vBackToFront.z))
+				self.lastVec = vBackToFront
+				# if (cbInfo.frameCount % 5 == 0):
+					# p.zeroMotion()
+			
+			p.applyImpulse(vBackToFront, VRScript.Math.Vector(0,0,0))
+
+		if (self.state == ParanormalState.Captured):
+			self.CapturedAnimation()

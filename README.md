@@ -10,11 +10,13 @@ TASK LIST
 =========
 ## MUST DO
 - [ ] put in doors and interactive objects
+- [ ] provide pre-rotation to objects
+- [ ] put in ghosts and monsters and stuff
 - [ ] *Lurcher* test (adding Physical().zeroMotion())
-- [ ] landscape location; might be fixed through rebake in meter
+- [ ] self-close main doors behind user
 
 ## NICE TO HAVE
-- [ ] self-close main doors behind user
+- [ ] main door coords: need to close gap
 - [ ] *Crawler* (creature moves randomly using Physics engine)
 
 ## PIPE DREAM
@@ -23,6 +25,9 @@ TASK LIST
 
 DEV LOG
 =======
+## 2013/05/18
+- [x] landscape location; might be fixed through rebake in meter
+
 ## 2013/05/17
 - [x] Load baked model for view plus simple model for physics
 - [x] *EnvObject* now fades in/out status text

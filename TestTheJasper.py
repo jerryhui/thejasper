@@ -20,7 +20,7 @@ theJasper = HauntedHouseEngine()
 # boxMonster = theJasper.AddParanormal(Paranormal.GhostFlyaway("boxMonster", "boxmon.osg", [-1,-3,0], "TOUCH"))
 # boxMonster2 = theJasper.AddParanormal(Paranormal.Crawler("boxMonster2", "boxmon.osg", [-1.5,-4,0], "TOUCH"))
 
-# ghostMan = theJasper.AddParanormal(Paranormal.Lurcher("ghostMan", "ghostman.ive", [-1,-1,0], "NEAR", Paranormal.ParanormalState.Hiding))
+ghostMan = theJasper.AddParanormal(Paranormal.Lurcher("ghostMan", "ghostman.ive", [-1,-1,0], "NEAR", Paranormal.ParanormalState.Hiding))
 # ghostMan2 = theJasper.AddParanormal(Paranormal.GhostFlyaway("ghostManFlyaway", "ghostman.ive", [-1,-2,0], "CLICK", Paranormal.ParanormalState.Discovered))
 
 # ----- chair bump test -----
@@ -30,16 +30,16 @@ theJasper = HauntedHouseEngine()
 # ghostMan.SetDiscoveredAnimation("001-01start.fbx", VRScript.Core.PlayMode.Loop, [90,0,0], VRScript.Math.Vector(0.01,0.01,0.01))
 # ghostMan.SetCapturedAnimation("jc-001.fbx")
 
-houseCoord = [-12.7, 2.25, 0]
-landscapeCoord = [ houseCoord[0]-18.36, houseCoord[1]-30.47, 0]
-landscapeObj = HouseObjects.ScalableObj("landscape", "Models\\Landscape\\landscape.ive", [0,0,0], True, False, "Concave", False, "Static", [0.3048,0.3048,0.3048])
-theJasper.AddObject( landscapeObj )
+# houseCoord = [-12.7, 2.25, 0]
+# landscapeCoord = [ houseCoord[0]-18.36, houseCoord[1]-30.47, 0]
+# landscapeObj = HouseObjects.ScalableObj("landscape", "Models\\Landscape\\landscape.ive", [0,0,0], True, False, "Concave", False, "Static", [0.3048,0.3048,0.3048])
+# theJasper.AddObject( landscapeObj )
 # chair = theJasper.AddObject(HouseObjects.ScalableObj("landscape", "Landscape\\landscape.ive",[1,1,0]))
 
-theJasper.AddMusic("ligeti-atmospheres.wav")
+# theJasper.AddMusic("ligeti-atmospheres.wav")
 theJasper.AddMusic("ligeti-lux.wav")
 
 # theJasper.create_entity("stairs", "Models\\stairs.osg", [-.5,0,0], True, True, "Concave", False, "Static")
 
-# theJasper.CreateGround()
+theJasper.CreateGround()
 # theJasper.create_ground_plane()
