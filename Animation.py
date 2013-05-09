@@ -163,14 +163,14 @@ class AudioObj(VRScript.Core.Behavior):
 					dist = int(d.length())
 					
 					if (dist != 0):
-						if (dist > 30):
-							totalGain *= (1/(dist-29))
-						elif (dist > 50):
+						if (dist > 1.5):
+							totalGain *= (1/(dist-1.49))
+						elif (dist > 15):
 							totalGain = 0
 
 					if (dist != self.dist):
 						self.dist = dist
-						# print ("{0} dist={1}, gain->{2}".format(self,str(dist),totalGain))
+						print ("{0} dist={1}, gain->{2}".format(self,str(dist),totalGain))
 						
 		self.SetGain(totalGain)
 		
