@@ -149,7 +149,7 @@ class Door(lel_common.GenericObject):
 	# Implements VRScript.Core.Behavior.OnButtonRelease
 	def OnButtonRelease(self, cbInfo, btInfo, user):
 		print("Door" + self.name + " clicked")
-		if (btInfo.button == 0):
+		if (btInfo.button < 3):
 			if (self.isOpen):
 				self.Close()
 			else:

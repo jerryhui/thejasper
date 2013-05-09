@@ -223,7 +223,10 @@ class Paranormal(lel_common.GenericObject):
 		
 		dotProd = pTrans.dot(uTrans)
 		lengthProd = pTrans.length() * uTrans.length()
-		cosVal = dotProd/lengthProd
+		if (lengthProd>0):
+			cosVal = dotProd/lengthProd
+		else:
+			cosVal = 0
 		cosVal = min(1, max(-1, cosVal))	# clamp val to [-1,1]
 		# print("{0}/{1} = {2}".format(dotProd, lengthProd, cosVal))
 		angle = math.degrees(math.acos(-cosVal))
@@ -233,7 +236,7 @@ class Paranormal(lel_common.GenericObject):
 		
 		if (math.floor(angle)>0):
 			pM = pM.postAxisAngle(-1, VRScript.Math.Vector(0, 0, 1))
-			print("{0} at angle {1} with user".format(self,angle))
+			# print("{0} at angle {1} with user".format(self,angle))
 		pM.setTranslation(pTrans)
 		self.movable().setPose(pM)
 

@@ -9,8 +9,11 @@ Created for DS501, Spring 2013
 TASK LIST
 =========
 ## MUST DO
-- [ ] put in doors and interactive objects
-- [ ] provide pre-rotation to objects
+- [ ] PHYSICS PROBLEMS:
+	- walking in between walls
+	- second floor doesn't hold objects (or are they off?)
+- [ ] doors (and others?) are slightly off
+- [ ] provide pre-rotation to objects (doors!)
 - [ ] put in ghosts and monsters and stuff
 - [ ] *Lurcher* test (adding Physical().zeroMotion())
 - [ ] self-close main doors behind user
@@ -27,6 +30,7 @@ DEV LOG
 =======
 ## 2013/05/18
 - [x] landscape location; might be fixed through rebake in meter
+- [ ] put in some doors and interactive objects (some problems)
 
 ## 2013/05/17
 - [x] Load baked model for view plus simple model for physics
