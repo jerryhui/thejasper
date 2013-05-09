@@ -183,11 +183,11 @@ class ScalableObj(VRScript.Core.Behavior):
 		
 class BumpableObj(lel_common.GenericObject):
 	def __init__(self,sName, sMeshName, position, bSound=None):
-		lel_common.GenericObject.__init__(self, sName, JasperConfig.ModelsDir + sMeshName, position, True, True, "Concave", True, "Dynamic")
+		lel_common.GenericObject.__init__(self, sName, JasperConfig.ModelsDir + sMeshName, position, True, True, "Hull", True, "Dynamic")
 		self.bumpedSound = None
 		if (type(bSound) is str):
 			self.SetBumpedSound(bSound)
-		self.physicsValues = [2.0, 0.25, 0.9, 1, 0.5]
+		self.physicsValues = [2.0, 0.9, 0.9, 1, 0.5]
 		
 	def SetBumpedSound(self,file):
 		self.bumpedSound = Animation.AudioObj(self.name + "_BumpedSound", file, False)
@@ -204,7 +204,7 @@ class BumpableObj(lel_common.GenericObject):
 		p.applyImpulse(vBackToFront, VRScript.Math.Vector(0,0,0))
 	
 	def OnCollision(self,cbInfo,intInfo):
-		if (intInfo.otherEntity.getName() != "GroundPlane"):
+		if (intInfo.otherEntity.getName() not in JasperEngine.GroundObjects):
 			print(self.name + ".OnCollision() with " + intInfo.otherEntity.getName())
 			m = self.movable().entityToSelf('User0')
 			

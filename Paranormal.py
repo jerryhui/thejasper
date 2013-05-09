@@ -60,6 +60,7 @@ class Paranormal(lel_common.GenericObject):
 		self.userDist = 0						# distance from user
 		self.userProxTrigger = -1		# longest distance from user that will trigger OnUserProximity()
 		self.isStaring = False			# set to True if paranormal should always rotate to face user
+		self.userDir = None				# stores last user direction
 		self.state = ParanormalState.Hiding		# starting state of this paranormal
 		if (initState == ParanormalState.Discovered):
 			print("Init discover " + str(self))
@@ -215,31 +216,29 @@ class Paranormal(lel_common.GenericObject):
 		lel_common.GenericObject.OnInit(self, cbInfo)
 	
 	def StareAtUser(self):
-		pM = self.movable().entityToSelf('User0')
-		uM = JasperEngine.User.movable().entityToSelf(self.name)
+		pass
+		# pM = self.movable().selfToWorld()
+		# uM = JasperEngine.User.movable().selfToWorld()
 		
-		pTrans = pM.getTranslation()
-		uTrans = uM.getTranslation()
+		# pTrans = pM.getTranslation()
+		# uTrans = uM.getTranslation()
 		
-		dotProd = pTrans.dot(uTrans)
-		lengthProd = pTrans.length() * uTrans.length()
-		if (lengthProd>0):
-			cosVal = dotProd/lengthProd
-		else:
-			cosVal = 0
-		cosVal = min(1, max(-1, cosVal))	# clamp val to [-1,1]
-		# print("{0}/{1} = {2}".format(dotProd, lengthProd, cosVal))
-		angle = math.degrees(math.acos(-cosVal))
+		# currUserDir = (uTrans - pTrans).normalize()
+		
+		# if (self.userDir is not None):
+			# cosVal = self.userDir.dot(currUserDir)
+			# cosVal = min(1, max(-1, cosVal))	# clamp val to [-1,1]
+			# angle = math.degrees(math.acos(cosVal))
+			# axis = self.userDir.cross(currUserDir)
 
-		pM = self.movable().getPose()
-		pTrans = pM.getTranslation()
+			# if (angle!=0):
+				# pM = pM.postAxisAngle(-angle, axis)
+				# print("axis = [{0},{1},{2}], angle={3}".format(axis.x,axis.y,axis.z,angle))
+			
+			# # pM.setTranslation(pTrans)
+			# self.movable().setPose(pM)
 		
-		if (math.floor(angle)>0):
-			pM = pM.postAxisAngle(-1, VRScript.Math.Vector(0, 0, 1))
-			# print("{0} at angle {1} with user".format(self,angle))
-		pM.setTranslation(pTrans)
-		self.movable().setPose(pM)
-
+		# self.userDir = currUserDir	# store for next calculation
 		
 		# pM = self.movable().selfToWorld()
 		# pTrans = pM.getTranslation()
@@ -371,10 +370,10 @@ class Lurcher(Paranormal):
 		
 	# Lurcher always moves toward player when idle.
 	def OnUpdate(self, cbInfo):
-		# if (cbInfo.frameCount % 5):
-		if (self.isStaring and self.state!=ParanormalState.Captured):
-			# rotate to face user
-			self.StareAtUser()
+		if (cbInfo.frameCount % 10):
+			if (self.isStaring and self.state!=ParanormalState.Captured):
+				# rotate to face user
+				self.StareAtUser()
 		# else:	
 			# # move towards user using Physics
 			# # m = self.movable().selfToEntity('User0')

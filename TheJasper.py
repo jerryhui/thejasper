@@ -16,16 +16,21 @@ houseCoord = [-12.7, 2.25, 0]
 landscapeCoord = [-12.7, 2.25, 0]
 # landscapeCoord = [-12.7, 2.25, -0.53]
 
-# baked model for showing
+# ----- House
+# Baked models
 # theJasper.create_entity("fullHouse", "Models\\final.ive", houseCoord, True, False, "Concave", False, "Static")
 theJasper.create_entity("landscape", "Models\\landscape.ive", landscapeCoord, True, True, "Concave", False, "Static")
 # simple model for physics
-theJasper.create_entity("simpleHouse", "Models\\simpleHouse.ive", houseCoord, True, True, "Concave", False, "Static")
+housePhysics = theJasper.create_entity("simpleHouse", "Models\\finalSimplified.ive", houseCoord, True, True, "Concave", False, "Static")
+theJasper.set_physics_properties("simpleHouse", [200.0, .999, 0.9, 1, 0.5])
+
+# ----- Ghosts, monsters, skeletons
+theJasper.AddParanormal(Paranormal.Paranormal("skeletonOnBike", "skeletonbike.ive", [0.1946421524363,102.529022018229,5.64167194396309], "LOOK"))
 
 # ghostMan = theJasper.AddParanormal(Paranormal.Ghost("ghostMan", "ghostman.ive", [0,0,0], "LOOK"))
 # ghostMan = theJasper.AddParanormal(Paranormal.GhostFlyaway("ghostManFlyaway", "ghostman.ive", [-1,-2,0], "LOOK"))
 
-# Doors, furniture
+# ----- Doors, furniture
 MainDoorLeft = theJasper.AddObject(HouseObjects.Door("MainDoorLeft", "Furniture\\lobby-door-left.ive", [-4.785,-0.712,0], True, -90))
 MainDoorRight = theJasper.AddObject(HouseObjects.Door("MainDoorRight", "Furniture\\lobby-door-right.ive", [-2.44,-0.742,0], True, 90))
 MainDoorLeft.AddSlaveDoor(MainDoorRight)
@@ -40,12 +45,16 @@ theJasper.AddObject(HouseObjects.Door("BR3BathDoor", "Furniture\\brDoor.ive", [-
 theJasper.AddObject(HouseObjects.Door("BR4BathDoor", "Furniture\\brDoor.ive", [-6.391027049925829,5.592147372410491,4.5], True, -90))
 
 theJasper.AddObject(HouseObjects.BumpableObj("victorianChair", "Furniture\\chair001.ive",[1.5115688278029,9.07393871938339,7.33374701944853],"ChairKick.wav"))
-theJasper.AddObject(HouseObjects.BumpableObj("rockingChair", "Furniture\\chair001.ive",[-8.09177704353456,9.02558333223351,4.41142346108209],"ChairKick.wav"))
-theJasper.AddObject(HouseObjects.BumpableObj("antiqueChest", "Furniture\\chest.ive",[-9.88431257446918,4.293953274490081,4.45999994610004],"ChairKick.wav"))
+theJasper.AddObject(HouseObjects.BumpableObj("rockingChair", "Furniture\\chair001.ive",[-8.09177704353456,9.02558333223351,5],"ChairKick.wav"))
+theJasper.AddObject(HouseObjects.BumpableObj("antiqueChest", "Furniture\\chest.ive",[-9.88431257446918,4.293953274490081,5],"ChairKick.wav"))
 
+theJasper.AddObject(HouseObjects.BumpableObj("bottle1", "Furniture\\bottle.ive",[-10.25991536527329,8.400711394023599,0.3],"GlassCrashing.wav"))
+theJasper.AddObject(HouseObjects.BumpableObj("bottle2", "Furniture\\bottle.ive",[-16.01995635091231,9.00775796055716,0.3],"GlassCrashing.wav"))
+theJasper.AddObject(HouseObjects.BumpableObj("bottle3", "Furniture\\bottle.ive",[-14.43351674990468,13.9358127318157,0.3],"GlassCrashing.wav"))
+theJasper.AddObject(HouseObjects.BumpableObj("bottle4", "Furniture\\bottle.ive",[-13.98054427526906,3.7847971945648,0.3],"GlassCrashing.wav"))
 
 theJasper.AddMusic("ligeti-lux.wav")
 theJasper.AddMusic("ligeti-atmospheres.wav")
-VRScript.Interaction.setJumpPoint(0,VRScript.Math.Matrix().setTranslation(VRScript.Math.Vector(-1,3,0)))
+VRScript.Interaction.setJumpPoint(0,VRScript.Math.Matrix().setTranslation(VRScript.Math.Vector(-10,8.400711394023599,0)))
 
 print("Finished loading The Jasper in {0} seconds.".format(time.time()-timestamp_start))

@@ -11,6 +11,8 @@ import Animation
 
 User = VRScript.Core.Entity('User0')	# User entity, declared for global reference.
 
+GroundObjects = ['simpleHouse']		# list of objects that shouldn't create collision events
+
 # Represents game stats and any other information that needs constant updating in CAVE.
 class EnvObject(VRScript.Core.Behavior):
 	def __init__(self,house):
@@ -49,6 +51,7 @@ class EnvObject(VRScript.Core.Behavior):
 			print(str(aud))
 			self.attach(aud.MakeAudible())
 		self.bkgMusicIndex = len(self.bkgMusic)-1	# always begin with track 1
+			
 		
 	# Sets the number of total paranormals.
 	# Input:
@@ -190,3 +193,6 @@ class HauntedHouseEngine(lel_common.LELScenario):
 		ground.attach(p)
 		ground.renderable('').show()
 		ground.movable().setPose(VRScript.Math.Matrix())
+		
+		GroundObjects.extend(["GroundPlane"])
+		print(GroundObjects)

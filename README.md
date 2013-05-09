@@ -9,11 +9,9 @@ Created for DS501, Spring 2013
 TASK LIST
 =========
 ## MUST DO
-- [ ] PHYSICS PROBLEMS:
-	- walking in between walls
-	- second floor doesn't hold objects (or are they off?)
 - [ ] doors (and others?) are slightly off
 - [ ] provide pre-rotation to objects (doors!)
+- [ ] add Jerry C's house shell
 - [ ] put in ghosts and monsters and stuff
 - [ ] *Lurcher* test (adding Physical().zeroMotion())
 - [ ] self-close main doors behind user
@@ -28,11 +26,15 @@ TASK LIST
 
 DEV LOG
 =======
-## 2013/05/18
+## 2013/05/09
+- [X] Fixed PHYSICS: by HULL on CONCAVE
+- [X] Fixed: Collision sound FX needs to stop! Distance damping not working
+
+## 2013/05/08
 - [x] landscape location; might be fixed through rebake in meter
 - [ ] put in some doors and interactive objects (some problems)
 
-## 2013/05/17
+## 2013/05/07
 - [x] Load baked model for view plus simple model for physics
 - [x] *EnvObject* now fades in/out status text
 - [x] *BumpableObj* gets kicked when interacting
