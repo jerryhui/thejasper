@@ -29,6 +29,7 @@ DEV LOG
 ## 2013/05/09
 - [X] Fixed PHYSICS: by HULL on CONCAVE
 - [X] Fixed: Collision sound FX needs to stop! Distance damping not working
+- [ ] Lobby door positions: touching, but now can't walk through
 
 ## 2013/05/08
 - [x] landscape location; might be fixed through rebake in meter

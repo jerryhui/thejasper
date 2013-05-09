@@ -71,7 +71,8 @@ class Door(lel_common.GenericObject):
 		self.soundFX.SetParent(self)
 		self.slaveDoors = []
 		self.masterDoorPtr = None
-
+		self.preAngles = [0,0,0]
+	
 	# Adds a door that should share the same state as this door.
 	# Remarks:
 	#		Have only ONE door out of a group to be the "master" door. All state checking will be done
@@ -86,6 +87,9 @@ class Door(lel_common.GenericObject):
 		self.masterDoorPtr = None
 		print("Added {0} as slave to {1}".format(door.name, self.name))
 
+	def SetPreEuler(self, preAngles):
+		self.preAngles = preAngles
+		
 	# Sets the sound effect to the opening and closing of this door.
 	# Input:
 	#	file - path to file (relative to JasperConfig.MusicDir)
@@ -94,6 +98,10 @@ class Door(lel_common.GenericObject):
 
 	def OnInit(self, cbInfo):
 		lel_common.GenericObject.OnInit(self, cbInfo)
+		if (self.preAngles != [0,0,0]):
+			m = self.movable().getPose()
+			m.postEuler(self.preAngles[0],self.preAngles[1],self.preAngles[2])
+			self.movable().setPose(m)
 		# self.physical('').setConstraints( VRScript.Math.Vector(1,1,0), VRScript.Math.Vector(1,1,1) )
 		
 	# Rotates this door at the given Euler angles.
@@ -154,40 +162,14 @@ class Door(lel_common.GenericObject):
 				self.Close()
 			else:
 				self.Open()
-
-# class ScalableObj(lel_common.GenericObject):
-# 	def __init__(self, sName, sMeshName, position, bVis, bPhysics, physicsShape, interact, physicsType, prescale):
-# 		lel_common.GenericObject.__init__(self, sName, sMeshName, position, bVis, bPhysics, physicsShape, interact, physicsType)
-# 		self.scaling = prescale
-# 		# self.prerotate = prerotate
-# 		print(sName + ".__init__()")
-# 		
-# 	def OnInit(self, cbInfo):
-# 		m = self.movable().getPose()
-# 		m = m.preScale(VRScript.Math.Vector(self.scaling[0], self.scaling[1], self.scaling[2]))
-# 		self.movable().setPose(m)
-# 		print(self.name + ".OnInit()")
-
-class ScalableObj(VRScript.Core.Behavior):
-	def __init__(self, sName, sMeshName, position, bVis, bPhysics, physicsShape, interact, physicsType, prescale):
-		print(sName + ".__init__()")
-		VRScript.Core.Behavior.__init__(self, sName+"wrapper")
-		self.obj = lel_common.GenericObject(sName, sMeshName, position, bVis, bPhysics, physicsShape, interact, physicsType)
-		self.preScale = prescale
-		
-	def OnInit(self, cbInfo):
-		m = self.obj.movable().getPose()
-		m = m.postScale(VRScript.Math.Vector(self.preScale[0], self.preScale[1], self.preScale[2]))
-		print(self.obj.name + "OnInit() scale to [{0},{1},{2}]".format(self.preScale[0], self.preScale[1], self.preScale[2]))
-		self.obj.movable().setPose(m)
 		
 class BumpableObj(lel_common.GenericObject):
-	def __init__(self,sName, sMeshName, position, bSound=None):
+	def __init__(self,sName, sMeshName, position, bSound=None, pProp = [2.0, 0.9, 0.9, 1, 0.5]):
 		lel_common.GenericObject.__init__(self, sName, JasperConfig.ModelsDir + sMeshName, position, True, True, "Hull", True, "Dynamic")
 		self.bumpedSound = None
 		if (type(bSound) is str):
 			self.SetBumpedSound(bSound)
-		self.physicsValues = [2.0, 0.9, 0.9, 1, 0.5]
+		self.physicsValues = pProp
 		
 	def SetBumpedSound(self,file):
 		self.bumpedSound = Animation.AudioObj(self.name + "_BumpedSound", file, False)
