@@ -10,7 +10,6 @@ TASK LIST
 =========
 ## MUST DO
 - [ ] doors (and others?) are slightly off
-- [ ] provide pre-rotation to objects (doors!)
 - [ ] add Jerry C's house shell
 - [ ] put in ghosts and monsters and stuff
 - [ ] *Lurcher* test (adding Physical().zeroMotion())
@@ -29,6 +28,7 @@ DEV LOG
 ## 2013/05/09
 - [X] Fixed PHYSICS: by HULL on CONCAVE
 - [X] Fixed: Collision sound FX needs to stop! Distance damping not working
+- [X] provide pre-rotation to objects (doors!)
 - [ ] Lobby door positions: touching, but now can't walk through
 
 ## 2013/05/08

@@ -46,15 +46,16 @@ theJasper.AddObject(HouseObjects.Door("BR2BathDoor", "Furniture\\brDoor.ive", [-
 theJasper.AddObject(HouseObjects.Door("BR3BathDoor", "Furniture\\brDoor.ive", [-1.311631360193999,3.93479542342146,4.5], True, -90))
 theJasper.AddObject(HouseObjects.Door("BR4BathDoor", "Furniture\\brDoor.ive", [-6.391027049925829,5.592147372410491,4.5], True, -90))
 
-theJasper.AddObject(HouseObjects.BumpableObj("victorianChair", "Furniture\\chair001.ive",[1.5115688278029,9.07393871938339,7.33374701944853],"ChairKick.wav"))
-theJasper.AddObject(HouseObjects.BumpableObj("rockingChair", "Furniture\\chair001.ive",[-8.09177704353456,9.02558333223351,5],"ChairKick.wav"))
-theJasper.AddObject(HouseObjects.BumpableObj("antiqueChest", "Furniture\\chest.ive",[-9.88431257446918,4.293953274490081,5],"ChairKick.wav"))
+theJasper.AddObject(HouseObjects.BumpableObj("victorianChair", "Furniture\\chair001.ive",[1.5115688278029,9.07393871938339,5],"ChairKick.wav",[20.0, 0.9, 0.9, 1, 0.5]))
+theJasper.AddObject(HouseObjects.BumpableObj("rockingChair", "Furniture\\chair001.ive",[-8.09177704353456,9.02558333223351,5],"ChairKick.wav",[20.0, 0.9, 0.9, 1, 0.5]))
+theJasper.AddObject(HouseObjects.BumpableObj("antiqueChest", "Furniture\\chest.ive",[-9.88431257446918,4.293953274490081,5],"ChairKick.wav",[50.0, 0.9, 0.9, 1, 0.5]))
 
-theJasper.AddObject(HouseObjects.BumpableObj("bottle1", "Furniture\\bottle.ive",[-10.25991536527329,8.400711394023599,0.3],"GlassCrashing.wav"))
-theJasper.AddObject(HouseObjects.BumpableObj("bottle2", "Furniture\\bottle.ive",[-16.01995635091231,9.00775796055716,0.3],"GlassCrashing.wav"))
-theJasper.AddObject(HouseObjects.BumpableObj("bottle3", "Furniture\\bottle.ive",[-14.43351674990468,13.9358127318157,0.3],"GlassCrashing.wav"))
-theJasper.AddObject(HouseObjects.BumpableObj("bottle4", "Furniture\\bottle.ive",[-13.98054427526906,3.7847971945648,0.3],"GlassCrashing.wav"))
+theJasper.AddObject(HouseObjects.BumpableObj("bottle1", "Furniture\\bottle.ive",[-10.25991536527329,8.400711394023599,0.3],"bottle-roll.wav",[1.0, 0.8, 0.8, .8, 0.5]))
+theJasper.AddObject(HouseObjects.BumpableObj("bottle2", "Furniture\\bottle.ive",[-16.01995635091231,9.00775796055716,0.3],"bottle-roll.wav",[1.0, 0.8, 0.8, .8, 0.5]))
+theJasper.AddObject(HouseObjects.BumpableObj("bottle3", "Furniture\\bottle.ive",[-14.43351674990468,13.9358127318157,0.3],"bottle-roll.wav",[1.0, 0.8, 0.8, .8, 0.5]))
+theJasper.AddObject(HouseObjects.BumpableObj("bottle4", "Furniture\\bottle.ive",[-13.98054427526906,3.7847971945648,0.3],"bottle-roll.wav",[1.0, 0.8, 0.8, .8, 0.5]))
 
+# ----- Background music
 theJasper.AddMusic("ligeti-lux.wav")
 theJasper.AddMusic("ligeti-atmospheres.wav")
 VRScript.Interaction.setJumpPoint(0,VRScript.Math.Matrix().setTranslation(VRScript.Math.Vector(-5,4,0)))
