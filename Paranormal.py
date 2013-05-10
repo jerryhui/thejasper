@@ -45,8 +45,17 @@ class Paranormal(lel_common.GenericObject):
 	#		string discoverCommand - command to discover this paranormal
 	#		ParanormalState initState - initial state of paranormal
 	#		string captureCommand - command to catch this paranormal (default: CLICK)
-	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding, captureCommand="CLICK", preRotate=None):
-		lel_common.GenericObject.__init__(self, name, JasperConfig.MonstersDir + sMeshName, location, True, True, "Concave", True, "Static")
+	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding, captureCommand="CLICK", preRotate=None, preScale=[1,1,1]):
+		if ("fbx" in sMeshName or "FBX" in sMeshName):
+			# hiding mesh is also FBX; load a placeholder for the mesh
+			self.hidingIsFBX = True
+			mesh = JasperConfig.MonstersDir + "placeholder.ive"
+			self.hidingFBX = Animation.AnimationMeta(name + "_hiding", JasperConfig.MonstersDir + sMeshName, VRScript.Core.PlayMode.Loop, preScale, preRotate)
+		else:
+			self.hidingIsFBX = False
+			mesh = JasperConfig.MonstersDir + sMeshName
+			self.hidingFBX = None		# animation file for discovery state
+		lel_common.GenericObject.__init__(self, name, mesh, location, True, True, "Concave", True, "Static")
 		self.discoverCommand = discoverCommand		# command(s) that will discover this paranormal
 		self.captureCommand = captureCommand			# command(s) that will capture this paranormal
 		self.type = "paranormal"		# human-friendly name for this type
@@ -54,8 +63,10 @@ class Paranormal(lel_common.GenericObject):
 		self.discoveredAudio = None	# audio to play when discovered
 		self.capturedFBX = None			# animation file for captured state
 		self.capturedAudio = None		# audio to play when captured
+		self.animObjHid = None					# animation object to hold hiding animation
 		self.animObjDis = None					# animation object to hold discovered animation
 		self.animObjCap = None					# animation object to hold captured animation
+		self.hidingAnimPlaymode = VRScript.Core.PlayMode.Loop
 		self.discoveredAnimPlaymode = VRScript.Core.PlayMode.Loop		# how discovered animation should be played
 		self.capturedAnimPlaymode = VRScript.Core.PlayMode.Once			# how captured animation should be played
 		self.userDist = 0						# distance from user
@@ -64,12 +75,8 @@ class Paranormal(lel_common.GenericObject):
 		self.userDir = None				# stores last user direction
 		self.state = ParanormalState.Hiding		# starting state of this paranormal
 		self.preRotate = preRotate		# rotate paranormal when loading
-		if (initState == ParanormalState.Discovered):
-			print("Init discover " + str(self))
-			self.Discover()
-		elif (initState == ParanormalState.Captured):
-			self.state == ParanormalState.Discovered
-			self.Capture()
+		self.preScale = preScale
+		self.initState = initState
 		print(self.name + " initialized. Current state=" + str(self.state))
 	
 	# Converts this Paranormal to a string.
@@ -102,8 +109,8 @@ class Paranormal(lel_common.GenericObject):
 	# Inputs:
 	#	file - file name of FBX
 	#	mode(OPT) - playback mode; as VRScript.Core.PlayMode
-	def SetDiscoveredAnimation(self, file, mode=VRScript.Core.PlayMode.Loop, preAngles=[0,0,0], preScale=VRScript.Math.Vector(1,1,1)):
-		self.discoveredFBX = Animation.AnimationMeta(self.name + "_discovered", JasperConfig.MonstersDir + file, mode, preScale, preAngles)
+	def SetDiscoveredAnimation(self, file, mode=VRScript.Core.PlayMode.Loop, preAngles=[0,0,0], preScale=[1,1,1]):
+		self.discoveredFBX = Animation.AnimationMeta(self.name + "_discovered", JasperConfig.MonstersDir + file, mode, preScale, preAngles, self)
 		print ("Set discovery anim for " + str(self) + " to " + file)
 
 	# Sets the audio file to play when this paranormal is discovered.
@@ -124,7 +131,8 @@ class Paranormal(lel_common.GenericObject):
 				self.DiscoveredAnimation()
 			else:
 				print("Use FBX for " + str(self) + "-discovered")
-				self.renderable(self.name).hide()
+				r = self.renderable('')
+				if (r is not None): r.hide()
 				self.animObjDis = Animation.AnimationObject(self.name + "Discovered")
 				self.animObjDis.LoadAnimMeta(self.discoveredFBX)
 				self.animObjDis.SetPosition(self.movable().getPose())
@@ -139,8 +147,8 @@ class Paranormal(lel_common.GenericObject):
 	# Inputs:
 	#	file - file name of FBX
 	#	mode(OPT) - playback mode; as VRScript.Core.PlayMode
-	def SetCapturedAnimation(self, file, mode=VRScript.Core.PlayMode.Once, preAngles=[0,0,0], preScale=VRScript.Math.Vector(1,1,1)):
-		self.capturedFBX = Animation.AnimationMeta(self.name + "_discovered", JasperConfig.MonstersDir + file, mode, preScale, preAngles)
+	def SetCapturedAnimation(self, file, mode=VRScript.Core.PlayMode.Once, preAngles=[0,0,0], preScale=[1,1,1]):
+		self.capturedFBX = Animation.AnimationMeta(self.name + "_discovered", JasperConfig.MonstersDir + file, mode, preScale, preAngles, self)
 
 	# Sets the audio file to play when this paranormal is captured.
 	# Inputs:
@@ -194,8 +202,13 @@ class Paranormal(lel_common.GenericObject):
 		if (self.renderable(self.name).isVisible()):
 			print("You have captured "+str(self)+"!\n")
 			self.renderable(self.name).hide()
+			
 		if (self.animObjCap is not None):
 			self.animObjCap.renderable('').hide()
+
+		# move mesh away
+		m = VRScript.Math.Matrix().setTranslation(VRScript.Math.Vector(-100,-100,-100))
+		self.movable().setPose(m)
 	
 	# Runs visual effect while idle.
 	def IdleAnimation(self):
@@ -209,7 +222,7 @@ class Paranormal(lel_common.GenericObject):
 		m = self.movable().getPose()
 		uv = JasperEngine.User.movable().getPose().getTranslation()
 		sv = m.getTranslation()
-		d = uv-sv	
+		d = uv-sv
 		return d.length()
 	
 	# This is triggered when the user is nearby. Implement if further interaction is desired.
@@ -220,10 +233,32 @@ class Paranormal(lel_common.GenericObject):
 	
 	def OnInit(self, cbInfo):
 		lel_common.GenericObject.OnInit(self, cbInfo)
+		m = None
 		if (self.preRotate is not None):
 			m = self.movable().getPose()
 			m.preEuler(self.preRotate[0], self.preRotate[1], self.preRotate[2])
-			self.movable().setPose(m)			
+			print(str(self) + ".preRotate " + str(self.preRotate))
+		if (self.preScale is not None):
+			if (m is None): m = self.movable().getPose()
+			m.preScale(VRScript.Math.Vector(self.preScale[0],self.preScale[1],self.preScale[2]))
+			print(str(self) + ".preScale " + str(self.preScale))
+		if (m is not None): self.movable().setPose(m)
+		
+		if (self.hidingFBX is not None):
+			self.animObjHid = Animation.AnimationObject(self.name + "Hiding")
+			self.animObjHid.LoadAnimMeta(self.hidingFBX)
+			self.animObjHid.SetPosition(self.movable().getPose())
+			self.animObjHid.Play(self.hidingAnimPlaymode)			
+		
+		if (self.initState == ParanormalState.Discovered):
+			print("Init discover " + str(self))
+			self.Discover()
+		elif (self.initState == ParanormalState.Captured):
+			self.state == ParanormalState.Discovered
+			self.Capture()
+		if (self.hidingIsFBX and self.state==ParanormalState.Hiding):
+			print("Play hiding animation")
+			self.animable().play()
 
 	# Rotate the paranormal to face the user.
 	# Ref: Galaxy Map project.
@@ -394,11 +429,15 @@ class SkeletonBiker(Lurcher):
 	def OnCollision(self, cbInfo, intInfo):
 		# Capture itself when run into user
 		otherEntity = intInfo.otherEntity.getName()
-		if (otherEntity not in JasperEngine.GroundObjects):
-			print("{0} ran into {1}".format(self, otherEntity))
+		# if (otherEntity not in JasperEngine.GroundObjects):
+			# print("{0} ran into {1}".format(self, otherEntity))
 		if (otherEntity == 'User0'):
 			self.Capture()
-			
+	
+	# Flips the biker over. (if there's time!)
+	# def CapturedAnimation(self):
+		# pass
+	
 class Crawler(Paranormal):
 	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding, captureCommand="CLICK", preRotate=None):
 		Paranormal.__init__(self, name, sMeshName, location, discoverCommand, initState, captureCommand, preRotate)

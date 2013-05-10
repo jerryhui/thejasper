@@ -11,13 +11,11 @@ TASK LIST
 ## MUST DO
 - [ ] put in ghosts and monsters and stuff
 - [ ] doors (and others?) are slightly off
-- [ ] check/fix capture FBX (not played/shown or too fast)
 
 ## NICE TO HAVE
 - [ ] turn on/off physics for doors?
-- [ ] *Lurcher* test (adding Physical().zeroMotion())
-- [ ] self-close main doors behind user
 - [ ] *Crawler* (creature moves randomly using Physics engine)
+- [ ] *Lurcher* captured animation
 
 ## PIPE DREAM
 - [ ] Wiimote/Kinect controls
@@ -25,6 +23,9 @@ TASK LIST
 
 DEV LOG
 =======
+## 2013/05/10
+- [x] *Paranormal* with FBX hacked
+
 ## 2013/05/09
 - [x] Fixed PHYSICS: by HULL on CONCAVE
 - [x] Fixed: Collision sound FX needs to stop! Distance damping not working
@@ -34,6 +35,7 @@ DEV LOG
 - [x] *Paranormal* add rotation to some monsters
 - [x] *Paranormal* staring works correctly!
 - [x] Fixed: status text broke
+- [x] *Lurcher* and *SkeletonBiker* finished
 
 ## 2013/05/08
 - [x] landscape location; might be fixed through rebake in meter

@@ -26,14 +26,18 @@ class EnvObject(VRScript.Core.Behavior):
 		self.name = "JasperEnvironment"
 		self.textAlpha = 1
 		self.textStep = 0
-		self.textHold = 1000
+		self.textHold = 20
+		self.textToShow = []
 		
 	# Initializes all stats.
 	def OnInit(self,cbInfo):
 		# create score text
-		self.scoreText = VRScript.Core.FontText('Score', 'You have caught {0} out of {1} ghosts'.format(self.paranormalCaptured,self.paranormalTotal))
+		self.textToShow.extend(['Welcome to The Jasper','Help us get rid of these scary monsters...','Find all {0} monsters'.format(self.paranormalTotal)])
+		# self.scoreText = VRScript.Core.FontText('Score', 'You have caught {0} out of {1} ghosts'.format(self.paranormalCaptured,self.paranormalTotal))
+		print ("Init textToShow: ", self.textToShow)
+		self.scoreText = VRScript.Core.FontText('Score', self.textToShow.pop(0), "Edward.TTF")
 		self.scoreText.setColor(VRScript.Core.Color(1,1,0,self.textAlpha))
-		self.scoreText.setHeight(.05)
+		self.scoreText.setHeight(.12)
 		self.scoreText.show()
 		self.attach(self.scoreText)
 
@@ -64,9 +68,11 @@ class EnvObject(VRScript.Core.Behavior):
 	def SetCaptured(self, n):
 		self.paranormalCaptured = n
 		if (n < self.paranormalTotal):
-			self.scoreText.setText('You have caught {0} out of {1} ghosts'.format(self.paranormalCaptured,self.paranormalTotal))
+			self.textToShow.extend(['You have caught {0} out of {1} ghosts'.format(self.paranormalCaptured,self.paranormalTotal)])
+			# self.scoreText.setText('You have caught {0} out of {1} ghosts'.format(self.paranormalCaptured,self.paranormalTotal))
 		else:
-			self.scoreText.setText('Congratulations! You have caught all {0} ghosts'.format(self.paranormalTotal))
+			self.textToShow.extend(['Congratulations! You have caught all {0} ghosts'.format(self.paranormalTotal)])
+			# self.scoreText.setText('Congratulations! You have caught all {0} ghosts'.format(self.paranormalTotal))
 	
 	# Add background music.
 	# Inputs:
@@ -81,18 +87,23 @@ class EnvObject(VRScript.Core.Behavior):
 	# Updates game stats. Perform rendering update ONLY when there's an actual change.
 	def OnUpdate(self, cbInfo):
 		# fade in/out text or hold
-		if (self.textHold > 0):
+		if (self.textStep==0 and self.textHold > 0):
 			self.textHold -= 1
 		elif (self.textHold ==0):
 			self.textStep = -.001
+		elif (self.textHold ==-99):
+			if (len(self.textToShow)>0):
+				self.scoreText.setText(self.textToShow.pop(0))
+				self.textStep = 0.001
+				self.textHold = 20
 		
 		if (self.textStep != 0):
 			self.textAlpha += self.textStep
 			if (self.textStep>0 and self.textAlpha >= 0.9):
 				self.textAlpha = 1
-				self.textHold = 2500
+				self.textHold = 20
 				self.textStep = 0
-				print("Stop fade in")
+				print("Stop fade in, start holding")
 			elif (self.textStep<0 and self.textAlpha <= 0.1):
 				self.textAlpha = 0
 				self.textHold = -99
@@ -105,7 +116,7 @@ class EnvObject(VRScript.Core.Behavior):
 		if (n != self.paranormalCaptured):
 			self.SetCaptured(n)
 			print("Begin fade in text")
-			self.textStep = 0.001
+			# self.textStep = 0.001
 				
 		# check/advance background music
 		if (self.bkgMusicIndex < len(self.bkgMusic)):

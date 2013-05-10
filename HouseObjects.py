@@ -64,7 +64,7 @@ class Door(lel_common.GenericObject):
 	#		isOpen - set to True if the object is the model of an open door
 	#		openAngle - the angle to turn in order to OPEN the door
 	def __init__(self, sName, sMeshName, position, isOpen, openAngle):
-		lel_common.GenericObject.__init__(self, sName, JasperConfig.ModelsDir + sMeshName, position, True, False, "Concave", True, "Static")
+		lel_common.GenericObject.__init__(self, sName, JasperConfig.ModelsDir + sMeshName, position, True, True, "Concave", True, "Dynamic")
 		self.isOpen = isOpen
 		self.openAngle = openAngle
 		self.soundFX = Animation.AudioObj(sName + "_fx", "door.wav")
@@ -193,7 +193,7 @@ class BumpableObj(lel_common.GenericObject):
 	
 	def OnCollision(self,cbInfo,intInfo):
 		if (intInfo.otherEntity.getName() not in JasperEngine.GroundObjects):
-			print(self.name + ".OnCollision() with " + intInfo.otherEntity.getName())
+			# print(self.name + ".OnCollision() with " + intInfo.otherEntity.getName())
 			m = self.movable().entityToSelf('User0')
 			
 			vBackToFront = VRScript.Math.Vector(0,1,0)
@@ -204,5 +204,5 @@ class BumpableObj(lel_common.GenericObject):
 			p.applyImpulse(vBackToFront, VRScript.Math.Vector(0,0,0))
 		
 			if (self.bumpedSound is not None):
-				print(self.name + "sound.Play()")
+				# print(self.name + "sound.Play()")
 				self.bumpedSound.Play()

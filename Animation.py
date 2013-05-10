@@ -182,12 +182,13 @@ class AudioObj(VRScript.Core.Behavior):
 #	VRScript.Math.Vector preScale - scale animation before loading
 #	[int,int,int] preAngles - rotate animation before laoding
 class AnimationMeta:
-	def __init__(self, name, file, playMode=VRScript.Core.PlayMode.Loop, preAngles=[0,0,0], preScale=VRScript.Math.Vector(1,1,1)):
+	def __init__(self, name, file, playMode=VRScript.Core.PlayMode.Loop, preAngles=[0,0,0], preScale=[1,1,1], parent=None):
 		self.name = name
 		self.file = file
 		self.playMode=playMode
 		self.preScale = preScale
 		self.preAngles = preAngles
+		self.parent = parent
 	def getName(self):
 		return self.name
 	def __str__(self):
@@ -199,6 +200,7 @@ class AnimationObject(VRScript.Core.Behavior):
 	def __init__(self, name):
 		VRScript.Core.Behavior.__init__(self,name)
 		self.name = name
+		self.parent = None
 		print(name + ".__init__()")	
 	
 	def OnInit(self, info):
@@ -207,18 +209,18 @@ class AnimationObject(VRScript.Core.Behavior):
 		self.interactible(self.name).enableSelection(True)
 		
 	def LoadAnimMeta(self, meta):
-		self.LoadAnimation(meta.file, meta.preScale, meta.preAngles)
+		self.LoadAnimation(meta.file, meta.preScale, meta.preAngles, meta.parent)
 	
 	# Load an animation file.
 	# Inputs:
 	#		file - file name (FBX file; in FBX 2009 or earlier)
 	#		preAngle - degree to rotate this animation before showing
 	#		VRScript.Math.Vector preScale - scale this animation before showing
-	def LoadAnimation(self, file, preAngles=[0,0,0], preScale=VRScript.Math.Vector(1,1,1)):
+	def LoadAnimation(self, file, preAngles=[0,0,0], preScale=[1,1,1], parent=None):
 		print("load animation: " +file + " for " + self.name)
 		
 		mat = VRScript.Math.Matrix()
-		mat.preScale(preScale)
+		mat.preScale(VRScript.Math.Vector(preScale[0],preScale[1],preScale[2]))
 
 		v = [VRScript.Math.Vector(1,0,0),VRScript.Math.Vector(0,1,0),VRScript.Math.Vector(0,0,1)]
 		for i in range(len(preAngles)):
@@ -230,7 +232,8 @@ class AnimationObject(VRScript.Core.Behavior):
 		self.attach(VRScript.Core.Renderable(self.name, self.mesh))
 		self.renderable('').show()
 		self.attach(VRScript.Core.Animable(self.name, self.mesh))
-	
+		self.parent = parent
+			
 	# Move this animation to the given Matrix.
 	# Input:
 	#		VRScript.Math.Matrix m - destination pose matrix
@@ -248,5 +251,7 @@ class AnimationObject(VRScript.Core.Behavior):
 	def Stop(self):
 		self.animable('').stop()
 
-	# def OnButtonRelease(self, btnInfo, intInfo):
-		# print("Animation clicked")
+	def OnButtonRelease(self, cbInfo, btnInfo, intInfo):
+		print(str(self) + " animation clicked")
+		if (self.parent is not None):
+			self.parent.OnButtonRelease(cbInfo, btnInfo, intInfo)

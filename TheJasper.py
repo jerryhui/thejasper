@@ -1,6 +1,5 @@
 from JasperEngine import *
 from Paranormal import ParanormalState
-import time
 
 # The Jasper - A Haunted House for CAVE
 # Modeling: Jerry Chen, Natalie Flunker, Hasti Mirkia
@@ -9,8 +8,6 @@ import time
 # Created for DS501, Spring 2013
 		
 #-------------------------- MAIN PROGRAM --------------------------------------
-timestamp_start = time.time()
-
 theJasper = HauntedHouseEngine()
 
 houseCoord = [-12.7, 2.25, 0]
@@ -19,11 +16,11 @@ landscapeCoord = [-12.7, 2.25, 0]
 
 # ----- House
 # Baked models
-# theJasper.create_entity("fullHouse", "Models\\final.ive", houseCoord, True, False, "Concave", False, "Static")
-# theJasper.create_entity("landscape", "Models\\landscape.ive", landscapeCoord, True, True, "Concave", False, "Static")
-# theJasper.create_entity("houseShell", "Models\\houseShell.ive", landscapeCoord, True, False, "Concave", False, "Static")
+theJasper.create_entity("fullHouse", "Models\\final.ive", houseCoord, True, False, "Concave", False, "Static")
+theJasper.create_entity("landscape", "Models\\landscape.ive", landscapeCoord, True, True, "Concave", False, "Static")
+theJasper.create_entity("houseShell", "Models\\houseShell.ive", landscapeCoord, True, False, "Concave", False, "Static")
 # simple model for physics
-housePhysics = theJasper.create_entity("simpleHouse", "Models\\finalBlock.ive", houseCoord, True, True, "Concave", False, "Static")
+housePhysics = theJasper.create_entity("simpleHouse", "Models\\finalBlock.ive", houseCoord, False, True, "Concave", False, "Static")
 theJasper.set_physics_properties("simpleHouse", [200.0, .999, 0.9, 1, 0.5])
 
 # ----- Ghosts, monsters, skeletons
@@ -82,6 +79,4 @@ theJasper.Factory("bottle", bottleCoords)
 # ----- Background music
 theJasper.AddMusic("ligeti-lux.wav")
 theJasper.AddMusic("ligeti-atmospheres.wav")
-VRScript.Interaction.setJumpPoint(0,VRScript.Math.Matrix().setTranslation(VRScript.Math.Vector(-5,4,0)))
-
-print("Finished loading The Jasper in {0} seconds.".format(time.time()-timestamp_start))
+# VRScript.Interaction.setJumpPoint(0,VRScript.Math.Matrix().setTranslation(VRScript.Math.Vector(0,0,0)))

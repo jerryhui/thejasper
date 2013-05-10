@@ -16,7 +16,7 @@ theJasper = HauntedHouseEngine()
 # ----- Double door test -----
 doorL = theJasper.AddObject(HouseObjects.Door("DoorLeft", "Furniture\\brDoor.ive", [-5.09199479842989,-4.40669061564667,0], True, -90))
 doorR = theJasper.AddObject(HouseObjects.Door("DoorLeft_1", "Furniture\\brDoor.ive", [-3.40250259842728,-4.42017033590422,0], True, 90))
-doorL.AddSlaveDoor(doorR)
+# doorL.AddSlaveDoor(doorR)
 
 # boxMonster = theJasper.AddParanormal(Paranormal.GhostFlyaway("boxMonster", "boxmon.osg", [-1,-3,0], "TOUCH"))
 # boxMonster2 = theJasper.AddParanormal(Paranormal.Crawler("boxMonster2", "boxmon.osg", [-1.5,-4,0], "TOUCH"))
@@ -26,11 +26,12 @@ ghostMan = theJasper.AddParanormal(Paranormal.SkeletonBiker("skelBike2", "skelet
 # ghostMan = theJasper.AddParanormal(Paranormal.Lurcher("ghostMan", "ghostman.ive", [-1,-1,0], "NEAR", Paranormal.ParanormalState.Hiding, "CLICK"))
 ghostMan2 = theJasper.AddParanormal(Paranormal.GhostFlyaway("ghostManFlyaway", "ghostman.ive", [-1,-2,0], "NEAR", Paranormal.ParanormalState.Discovered, .001, .01, "CLICK"))
 
-fireMonster = theJasper.AddParanormal(Paranormal.Paranormal("FireMonster", "firemon-hidden.fbx", [3,5,1], "LOOK", ParanormalState.Hiding))
-fireMonster.SetDiscoveredAnimation("firemon-hidden.fbx",VRScript.Core.PlayMode.Loop,[90,0,-90])
+fireMonster = theJasper.AddParanormal(Paranormal.Paranormal("FireMonster", "firemon-hover.fbx", [3,5,1], "NEAR", ParanormalState.Hiding, "CLICK", [90,0,-90],[.025,.025,.025]))
+fireMonster.SetDiscoveredAnimation("firemon-jump.fbx",VRScript.Core.PlayMode.Loop,[90,0,-90],[.025,.025,.025])
 fireMonster.SetDiscoveredSound("AudioFiles\\Fire.wav")
-fireMonster.SetCapturedAnimation("firemon-captured.fbx",VRScript.Core.PlayMode.Loop,[90,0,0])
+fireMonster.SetCapturedAnimation("firemon-dead.fbx",VRScript.Core.PlayMode.Loop,[90,0,0],[.025,.025,.025])
 fireMonster.SetStaring(True)
+fireMonster.Discover()
 
 # ----- chair bump test -----
 chair = theJasper.AddObject(HouseObjects.BumpableObj("chair1", "Furniture\\chair001.ive",[1,1,0]))
@@ -52,3 +53,5 @@ theJasper.AddMusic("ligeti-lux.wav")
 
 theJasper.CreateGround()
 # theJasper.create_ground_plane()
+
+theJasper.textToShow.extend(["Welcome to The Jasper","Help us get rid of these scary monsters!"])
