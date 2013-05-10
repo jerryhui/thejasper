@@ -64,7 +64,7 @@ class Door(lel_common.GenericObject):
 	#		isOpen - set to True if the object is the model of an open door
 	#		openAngle - the angle to turn in order to OPEN the door
 	def __init__(self, sName, sMeshName, position, isOpen, openAngle):
-		lel_common.GenericObject.__init__(self, sName, JasperConfig.ModelsDir + sMeshName, position, True, True, "Concave", True, "Static")
+		lel_common.GenericObject.__init__(self, sName, JasperConfig.ModelsDir + sMeshName, position, True, False, "Concave", True, "Static")
 		self.isOpen = isOpen
 		self.openAngle = openAngle
 		self.soundFX = Animation.AudioObj(sName + "_fx", "door.wav")
@@ -117,38 +117,44 @@ class Door(lel_common.GenericObject):
 	#	skipSlave(OPT) - for internal use only: do not check/open slave doors.
 	#	justOpen(OPT) - just open this door without checking master/slave; necessary to stop recursion
 	def Open(self, skipSlave=False, justOpen=False):
-		if (justOpen or self.masterDoorPtr is None):
-			# this is a master door
-			print("Open door " + self.name)
-			self.Rotate(self.openAngle,0,0)
-			self.isOpen = True
-			if (justOpen or not skipSlave):
-				self.SetAllDoors()
-		else:
-			self.masterDoorPtr.Open()
+		print("Open door " + self.name)
+		self.Rotate(self.openAngle,0,0)
+		self.isOpen = True
+		# if (justOpen or self.masterDoorPtr is None):
+			# # this is a master door
+			# print("Open door " + self.name)
+			# self.Rotate(self.openAngle,0,0)
+			# self.isOpen = True
+			# if (justOpen or not skipSlave):
+				# self.SetAllDoors()
+		# else:
+			# self.masterDoorPtr.Open()
 
 	# Closes this door.
 	# Input:
 	#	skipSlave(OPT) - for internal use only: do not check/close slave doors.
 	#	justClose(OPT) - just close this door without checking master/slave; necessary to stop recursion
 	def Close(self, skipSlave=False, justClose=False):
-		if (justClose or self.masterDoorPtr is None):
-			print("Close door " + self.name)
-			self.Rotate(self.openAngle*-1,0,0)
-			self.isOpen = False
-			if (justClose or not skipSlave):
-				self.SetAllDoors()
-		else:
-			self.masterDoorPtr.Close()
+		print("Close door " + self.name)
+		self.Rotate(self.openAngle*-1,0,0)
+		self.isOpen = False
+		# if (justClose or self.masterDoorPtr is None):
+			# print("Close door " + self.name)
+			# self.Rotate(self.openAngle*-1,0,0)
+			# self.isOpen = False
+			# if (justClose or not skipSlave):
+				# self.SetAllDoors()
+		# else:
+			# self.masterDoorPtr.Close()
 	
 	# Do a one-pass on all slave doors and open/close them according to CURRENT state of this door.
-	def SetAllDoors(self):
-		for slaveDoor in self.slaveDoors:
-			if (self.isOpen != slaveDoor.isOpen):
-				if (self.isOpen): 
-					slaveDoor.Open(True,True)
-				else:
-					slaveDoor.Close(True,True)
+	# def SetAllDoors(self):
+		# for slaveDoor in self.slaveDoors:
+			# if (self.isOpen != slaveDoor.isOpen):
+				# if (self.isOpen): 
+					# slaveDoor.Open(True,True)
+				# else:
+					# slaveDoor.Close(True,True)
 	
 	def OnUpdate(self, cbInfo):
 		lel_common.GenericObject.OnUpdate(self, cbInfo)

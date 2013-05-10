@@ -45,7 +45,7 @@ class Paranormal(lel_common.GenericObject):
 	#		string discoverCommand - command to discover this paranormal
 	#		ParanormalState initState - initial state of paranormal
 	#		string captureCommand - command to catch this paranormal (default: CLICK)
-	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding, captureCommand="CLICK"):
+	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding, captureCommand="CLICK", preRotate=None):
 		lel_common.GenericObject.__init__(self, name, JasperConfig.MonstersDir + sMeshName, location, True, True, "Concave", True, "Static")
 		self.discoverCommand = discoverCommand		# command(s) that will discover this paranormal
 		self.captureCommand = captureCommand			# command(s) that will capture this paranormal
@@ -54,7 +54,8 @@ class Paranormal(lel_common.GenericObject):
 		self.discoveredAudio = None	# audio to play when discovered
 		self.capturedFBX = None			# animation file for captured state
 		self.capturedAudio = None		# audio to play when captured
-		self.animObj = None					# animation object to hold discovered/captured animation
+		self.animObjDis = None					# animation object to hold discovered animation
+		self.animObjCap = None					# animation object to hold captured animation
 		self.discoveredAnimPlaymode = VRScript.Core.PlayMode.Loop		# how discovered animation should be played
 		self.capturedAnimPlaymode = VRScript.Core.PlayMode.Once			# how captured animation should be played
 		self.userDist = 0						# distance from user
@@ -62,6 +63,7 @@ class Paranormal(lel_common.GenericObject):
 		self.isStaring = False			# set to True if paranormal should always rotate to face user
 		self.userDir = None				# stores last user direction
 		self.state = ParanormalState.Hiding		# starting state of this paranormal
+		self.preRotate = preRotate		# rotate paranormal when loading
 		if (initState == ParanormalState.Discovered):
 			print("Init discover " + str(self))
 			self.Discover()
@@ -101,7 +103,7 @@ class Paranormal(lel_common.GenericObject):
 	#	file - file name of FBX
 	#	mode(OPT) - playback mode; as VRScript.Core.PlayMode
 	def SetDiscoveredAnimation(self, file, mode=VRScript.Core.PlayMode.Loop, preAngles=[0,0,0], preScale=VRScript.Math.Vector(1,1,1)):
-		self.discoveredFBX = Animation.AnimationMeta(self.name + "_discovered", file, mode, preScale, preAngles)
+		self.discoveredFBX = Animation.AnimationMeta(self.name + "_discovered", JasperConfig.MonstersDir + file, mode, preScale, preAngles)
 		print ("Set discovery anim for " + str(self) + " to " + file)
 
 	# Sets the audio file to play when this paranormal is discovered.
@@ -123,10 +125,10 @@ class Paranormal(lel_common.GenericObject):
 			else:
 				print("Use FBX for " + str(self) + "-discovered")
 				self.renderable(self.name).hide()
-				self.animObj = Animation.AnimationObject(self.name + "_discovered")
-				self.animObj.LoadAnimMeta(self.discoveredFBX)
-				self.animObj.SetPosition(self.movable().getPose())
-				self.animObj.Play(self.discoveredAnimPlaymode)
+				self.animObjDis = Animation.AnimationObject(self.name + "Discovered")
+				self.animObjDis.LoadAnimMeta(self.discoveredFBX)
+				self.animObjDis.SetPosition(self.movable().getPose())
+				self.animObjDis.Play(self.discoveredAnimPlaymode)
 			# play audio
 			if (self.discoveredAudio is not None):
 				self.discoveredAudio.Play()
@@ -138,7 +140,7 @@ class Paranormal(lel_common.GenericObject):
 	#	file - file name of FBX
 	#	mode(OPT) - playback mode; as VRScript.Core.PlayMode
 	def SetCapturedAnimation(self, file, mode=VRScript.Core.PlayMode.Once, preAngles=[0,0,0], preScale=VRScript.Math.Vector(1,1,1)):
-		self.capturedFBX = Animation.AnimationMeta(self.name + "_discovered", file, mode, preScale, preAngles)
+		self.capturedFBX = Animation.AnimationMeta(self.name + "_discovered", JasperConfig.MonstersDir + file, mode, preScale, preAngles)
 
 	# Sets the audio file to play when this paranormal is captured.
 	# Inputs:
@@ -160,10 +162,12 @@ class Paranormal(lel_common.GenericObject):
 				self.CapturedAnimation()
 			else:
 				self.renderable(self.name).hide()
-				self.animObj = Animation.AnimationObject(self.name + "_captured")
-				self.animObj.LoadAnimMeta(self.capturedFBX)
-				self.animObj.SetPosition(self.movable().getPose())
-				self.animObj.Play(self.capturedAnimPlaymode)
+				if (self.animObjDis is not None):
+					self.animObjDis.renderable('').hide()
+				self.animObjCap = Animation.AnimationObject(self.name + "Captured")
+				self.animObjCap.LoadAnimMeta(self.capturedFBX)
+				self.animObjCap.SetPosition(self.movable().getPose())
+				self.animObjCap.Play(self.capturedAnimPlaymode)
 			# play audio
 			if (self.discoveredAudio is not None):
 				self.discoveredAudio.Stop(self.capturedAudio is None, -0.5)
@@ -190,8 +194,8 @@ class Paranormal(lel_common.GenericObject):
 		if (self.renderable(self.name).isVisible()):
 			print("You have captured "+str(self)+"!\n")
 			self.renderable(self.name).hide()
-		if (self.animObj is not None):
-			self.animObj.renderable('').hide()
+		if (self.animObjCap is not None):
+			self.animObjCap.renderable('').hide()
 	
 	# Runs visual effect while idle.
 	def IdleAnimation(self):
@@ -202,59 +206,52 @@ class Paranormal(lel_common.GenericObject):
 	# Returns:
 	#	(float) distance between self and User0
 	def UserDistance(self):
-		m = self.movable().getPose()					
+		m = self.movable().getPose()
 		uv = JasperEngine.User.movable().getPose().getTranslation()
 		sv = m.getTranslation()
 		d = uv-sv	
 		return d.length()
 	
-	# This is triggered when the user is nearby. Implement if interaction is desired.
+	# This is triggered when the user is nearby. Implement if further interaction is desired.
 	def OnUserProximity(self):
-		pass
+		if (self.state == ParanormalState.Hiding and ("NEAR" in self.discoverCommand)):
+			print("You've found {0} by proximity!".format(self))
+			self.AdvanceState()
 	
 	def OnInit(self, cbInfo):
 		lel_common.GenericObject.OnInit(self, cbInfo)
-	
-	def StareAtUser(self):
-		pass
-		# pM = self.movable().selfToWorld()
-		# uM = JasperEngine.User.movable().selfToWorld()
-		
-		# pTrans = pM.getTranslation()
-		# uTrans = uM.getTranslation()
-		
-		# currUserDir = (uTrans - pTrans).normalize()
-		
-		# if (self.userDir is not None):
-			# cosVal = self.userDir.dot(currUserDir)
-			# cosVal = min(1, max(-1, cosVal))	# clamp val to [-1,1]
-			# angle = math.degrees(math.acos(cosVal))
-			# axis = self.userDir.cross(currUserDir)
+		if (self.preRotate is not None):
+			m = self.movable().getPose()
+			m.preEuler(self.preRotate[0], self.preRotate[1], self.preRotate[2])
+			self.movable().setPose(m)			
 
-			# if (angle!=0):
-				# pM = pM.postAxisAngle(-angle, axis)
-				# print("axis = [{0},{1},{2}], angle={3}".format(axis.x,axis.y,axis.z,angle))
-			
-			# # pM.setTranslation(pTrans)
-			# self.movable().setPose(pM)
-		
-		# self.userDir = currUserDir	# store for next calculation
-		
-		# pM = self.movable().selfToWorld()
-		# pTrans = pM.getTranslation()
-		# # pM = VRScript.Math.Matrix()
+	# Rotate the paranormal to face the user.
+	# Ref: Galaxy Map project.
+	def StareAtUser(self):
+		pM = self.movable().selfToWorld()
+		uM = JasperEngine.User.movable().selfToWorld()
+
+		pTrans = pM.getTranslation()
+		uTrans = uM.getTranslation()
+
+		currUserDir = (uTrans - pTrans).normalize()
+
+		x = pTrans.x - uTrans.x
+		y = pTrans.y - uTrans.y
+
+		#atan2 uses the signs of both components to figure out the full angle
+		angle = -math.atan2(x, y) * (180 / math.pi)
+		pM = VRScript.Math.Matrix().postAxisAngle(angle, VRScript.Math.Vector(0, 0, 1))
+		pM.preTranslation(pTrans)
+		self.movable().setPose(pM)
 	
-		# um = JasperEngine.User.movable().selfToWorld()
-		
-		# ueu = um.getEuler()
-		# peu = pM.getEuler()
-		# if (ueu.x - peu.x > 0):
-			# pM = pM.postEuler(1, peu.y, peu.z)
-		# else:
-			# pM = pM.postEuler(-1, peu.y, peu.z)
-		
-		# pM.setTranslation(pTrans)
-		# self.movable().setPose(pM)
+	# Implements user distance checking. Raises OnUserProximity event when user breaches trigger distance.
+	def CheckUserProx(self):
+		d = self.UserDistance()
+		if (self.userDist != d):
+			self.userDist = d
+			if (d <= self.userProxTrigger):
+				self.OnUserProximity()
 	
 	# Implements VRScript.Core.Behavior.OnUpdate.
 	def OnUpdate(self, cbInfo):
@@ -263,13 +260,8 @@ class Paranormal(lel_common.GenericObject):
 			self.StareAtUser()
 		
 		if (self.userProxTrigger > 0):
-			# implements user distance checking
-			d = self.UserDistance()
-			if (self.userDist != d):
-				self.userDist = d
-				if (d <= self.userProxTrigger):
-					self.OnUserProximity()
-					# print("{0}.userDist={1}".format(self,d))
+			self.CheckUserProx()
+
 		if (self.state == ParanormalState.Discovered):
 			self.IdleAnimation()
 		elif (self.state == ParanormalState.Captured):
@@ -283,14 +275,14 @@ class Paranormal(lel_common.GenericObject):
 			self.AdvanceState()
 		
 class Ghost(Paranormal):
-	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding, hoverDist=0.001, hoverSpeed=0.01):
+	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding, hoverDist=0.001, hoverSpeed=0.01, captureCommand="CLICK", preRotate=None):
 		# debug: must set defautl Ghost properties that are needed for Discovered or Captured,
 		# in case user wants initial state something other than Hiding
 		self.hover = -1
 		self.hoverDistance = hoverDist
 		self.hoverSpeed = hoverSpeed
 		self.shrinkCount = 0
-		Paranormal.__init__(self, name, sMeshName, location, discoverCommand, initState)
+		Paranormal.__init__(self, name, sMeshName, location, discoverCommand, initState, captureCommand, preRotate)
 		self.type = "ghost"
 		self.SetDiscoveredSound("moan.wav")
 		self.SetCapturedSound("scream1.wav")
@@ -327,12 +319,6 @@ class Ghost(Paranormal):
 			self.hover += self.hoverSpeed
 			self.hover %= 360
 			
-	def OnUserProximity(self):
-		Paranormal.OnUserProximity(self)
-		if (self.state == ParanormalState.Hiding):
-			print("You've found {0} by proximity!".format(self))
-			self.AdvanceState()
-
 # Represents a ghost that flies straight up and away when captured.
 class GhostFlyaway(Ghost):
 	def Capture(self):
@@ -346,7 +332,7 @@ class GhostFlyaway(Ghost):
 	# Sends the ghost up high heavens...
 	def CapturedAnimation(self):
 		if (self.flyCount>0):
-			print("Capture - fly away count=", self.flyCount)
+			# print("Capture - fly away count=", self.flyCount)
 			m = self.movable().getPose()
 			m.preTranslation(VRScript.Math.Vector(0,0,self.flyDistance))
 			self.movable().setPose(m)
@@ -357,52 +343,65 @@ class GhostFlyaway(Ghost):
 
 # A Lurcher, when discovered, rushes forward and then disappears (captured)
 class Lurcher(Paranormal):
-	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding):
-		Paranormal.__init__(self, name, sMeshName, location, discoverCommand, initState)
+	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding, captureCommand="CLICK", preRotate=None, moveImpulse=0.6):
+		Paranormal.__init__(self, name, sMeshName, location, discoverCommand, initState, captureCommand, preRotate)
 		self.type = "lurcher"
 		self.SetStaring(True)
 		self.physicsValues = [3.0, 0.9, 0.995, 1, 0.5]
 		self.lastVec = VRScript.Math.Vector(0,0,0)
+		self.moveImpulse = moveImpulse
 		print("{0} created.".format(self))
 
-	# def OnInit(self,cbInfo):
-		# Paranormal.OnInit(self,cbInfo)
-		
 	# Lurcher always moves toward player when idle.
 	def OnUpdate(self, cbInfo):
+		self.CheckUserProx()
+	
+		# splits physics manipulation and pose matrix manipulation
 		if (cbInfo.frameCount % 10):
 			if (self.isStaring and self.state!=ParanormalState.Captured):
 				# rotate to face user
 				self.StareAtUser()
-		# else:	
-			# # move towards user using Physics
-			# # m = self.movable().selfToEntity('User0')
-			# m = self.movable().selfToWorld()
+		elif (self.state == ParanormalState.Discovered):
+			# move towards user using Physics
+			# m = self.movable().selfToEntity('User0')
+			m = self.movable().selfToWorld()
 			
-			# vBackToFront = VRScript.Math.Vector(0,-1,0)
-			# vBackToFront = m.transform(vBackToFront)
-			# vBackToFront = vBackToFront.normalize()
-			# vBackToFront = vBackToFront * 0.2
-			# vBackToFront.z = 0
+			vBackToFront = VRScript.Math.Vector(0,-1,0)
+			vBackToFront = m.transform(vBackToFront)
+			vBackToFront = vBackToFront.normalize()
+			vBackToFront = vBackToFront * self.moveImpulse
+			vBackToFront.z = 0
 			
-			# p = self.physical()
-			# p.setCollisionType(VRScript.Core.CollisionType.Dynamic)
+			p = self.physical()
+			p.setCollisionType(VRScript.Core.CollisionType.Dynamic)
 			
-			# # attempt to stop this Lurcher in its track if angle changes
-			# if (vBackToFront != self.lastVec):
-				# print("vBackToFront {0},{1},{2}".format(vBackToFront.x, vBackToFront.y, vBackToFront.z))
-				# self.lastVec = vBackToFront
-				# # if (cbInfo.frameCount % 5 == 0):
-					# # p.zeroMotion()
+			# attempt to stop this Lurcher in its track if angle changes
+			if (vBackToFront != self.lastVec):
+				self.lastVec = vBackToFront
 			
-			# p.applyImpulse(vBackToFront, VRScript.Math.Vector(0,0,0))
+			p.applyImpulse(vBackToFront, VRScript.Math.Vector(0,0,0))
 
 		if (self.state == ParanormalState.Captured):
 			self.CapturedAnimation()
+
+class SkeletonBiker(Lurcher):
+	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding, captureCommand="CLICK", preRotate=None, moveImpulse=5):
+		Lurcher.__init__(self, name, sMeshName, location, discoverCommand, initState, captureCommand, preRotate, moveImpulse)
+		self.SetUserProximityTrigger(2.5)
+		self.SetDiscoveredSound("bicyclebell.wav")
+		self.SetCapturedSound("bikeCrash.wav")
+	
+	def OnCollision(self, cbInfo, intInfo):
+		# Capture itself when run into user
+		otherEntity = intInfo.otherEntity.getName()
+		if (otherEntity not in JasperEngine.GroundObjects):
+			print("{0} ran into {1}".format(self, otherEntity))
+		if (otherEntity == 'User0'):
+			self.Capture()
 			
 class Crawler(Paranormal):
-	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding):
-		Paranormal.__init__(self, name, sMeshName, location, discoverCommand, initState)
+	def __init__(self, name, sMeshName, location, discoverCommand, initState=ParanormalState.Hiding, captureCommand="CLICK", preRotate=None):
+		Paranormal.__init__(self, name, sMeshName, location, discoverCommand, initState, captureCommand, preRotate)
 		self.crawlDistance = 5
 		self.type = "crawler"
 		print("New Crawler " + name)

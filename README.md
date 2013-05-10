@@ -9,14 +9,14 @@ Created for DS501, Spring 2013
 TASK LIST
 =========
 ## MUST DO
-- [ ] doors (and others?) are slightly off
-- [ ] add Jerry C's house shell
 - [ ] put in ghosts and monsters and stuff
-- [ ] *Lurcher* test (adding Physical().zeroMotion())
-- [ ] self-close main doors behind user
+- [ ] doors (and others?) are slightly off
+- [ ] check/fix capture FBX (not played/shown or too fast)
 
 ## NICE TO HAVE
-- [ ] main door coords: need to close gap
+- [ ] turn on/off physics for doors?
+- [ ] *Lurcher* test (adding Physical().zeroMotion())
+- [ ] self-close main doors behind user
 - [ ] *Crawler* (creature moves randomly using Physics engine)
 
 ## PIPE DREAM
@@ -26,10 +26,14 @@ TASK LIST
 DEV LOG
 =======
 ## 2013/05/09
-- [X] Fixed PHYSICS: by HULL on CONCAVE
-- [X] Fixed: Collision sound FX needs to stop! Distance damping not working
-- [X] provide pre-rotation to objects (doors!)
-- [ ] Lobby door positions: touching, but now can't walk through
+- [x] Fixed PHYSICS: by HULL on CONCAVE
+- [x] Fixed: Collision sound FX needs to stop! Distance damping not working
+- [x] provide pre-rotation to objects (doors!)
+- [x] add Jerry C's house shell
+- [x] REMOVED: Lobby door positions: touching, but now can't walk through
+- [x] *Paranormal* add rotation to some monsters
+- [x] *Paranormal* staring works correctly!
+- [x] Fixed: status text broke
 
 ## 2013/05/08
 - [x] landscape location; might be fixed through rebake in meter

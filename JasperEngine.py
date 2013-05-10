@@ -27,7 +27,7 @@ class EnvObject(VRScript.Core.Behavior):
 		self.textAlpha = 1
 		self.textStep = 0
 		self.textHold = 1000
-	
+		
 	# Initializes all stats.
 	def OnInit(self,cbInfo):
 		# create score text
@@ -51,7 +51,6 @@ class EnvObject(VRScript.Core.Behavior):
 			print(str(aud))
 			self.attach(aud.MakeAudible())
 		self.bkgMusicIndex = len(self.bkgMusic)-1	# always begin with track 1
-			
 		
 	# Sets the number of total paranormals.
 	# Input:
@@ -64,7 +63,10 @@ class EnvObject(VRScript.Core.Behavior):
 	#	n - Number of caught paranormals
 	def SetCaptured(self, n):
 		self.paranormalCaptured = n
-		self.scoreText.setText('You have caught {0} out of {1} ghosts'.format(self.paranormalCaptured,self.paranormalTotal))
+		if (n < self.paranormalTotal):
+			self.scoreText.setText('You have caught {0} out of {1} ghosts'.format(self.paranormalCaptured,self.paranormalTotal))
+		else:
+			self.scoreText.setText('Congratulations! You have caught all {0} ghosts'.format(self.paranormalTotal))
 	
 	# Add background music.
 	# Inputs:
@@ -180,7 +182,22 @@ class HauntedHouseEngine(lel_common.LELScenario):
 	def AddMusic(self,file):
 		print("DEBUG: HauntedHouse.AddMusic()")
 		self.env.AddMusic(file)
-		
+	
+	def Factory(self, objName, coordArr, param1=None, param2=None):
+		cnt = 0
+		if (objName == "bottle"):
+			# Wine bottle
+			for coords in coordArr:
+				self.AddObject(HouseObjects.BumpableObj("bottle{0}".format(cnt), "Furniture\\bottle.ive", coords,"bottle-roll.wav", [1.0, 0.8, 0.8, .8, 0.5]))
+				cnt += 1
+		if (objName == "door"):
+			# Wooden door
+			for coords in coordArr:
+				door = self.AddObject(HouseObjects.Door("WoodenDoor{0}".format(cnt), "Furniture\\brDoor.ive", coords, True, -90))
+				if (param1[cnt] != 0):
+					door.SetPreEuler([param1[cnt],0,0])
+				cnt += 1
+	
 	def CreateGround(self):
 		ground = VRScript.Core.Behavior("GroundPlane")
 		ground_plane = VRScript.Resources.Box(VRScript.Math.Vector(50,50,.25), VRScript.Math.Point(0,0,-.25))

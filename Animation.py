@@ -170,7 +170,7 @@ class AudioObj(VRScript.Core.Behavior):
 
 					if (dist != self.dist):
 						self.dist = dist
-						print ("{0} dist={1}, gain->{2}".format(self,str(dist),totalGain))
+						# print ("{0} dist={1}, gain->{2}".format(self,str(dist),totalGain))
 						
 		self.SetGain(totalGain)
 		
@@ -198,13 +198,14 @@ class AnimationObject(VRScript.Core.Behavior):
 	# class AnimationObject(VRScript.Core.Behavior):
 	def __init__(self, name):
 		VRScript.Core.Behavior.__init__(self,name)
+		self.name = name
+		print(name + ".__init__()")	
 	
-	# 
-	# 	def OnInit(self, info):
-	# 		self.attach(VRScript.Core.Interactible(self.name, self.renderable('')))
-	# 		self.interactible(self.name).enableGrab(False)
-	# 		self.interactible(self.name).enableSelection(True)		
-	
+	def OnInit(self, info):
+		self.attach(VRScript.Core.Interactible(self.name, self.renderable('')))
+		self.interactible(self.name).enableGrab(False)
+		self.interactible(self.name).enableSelection(True)
+		
 	def LoadAnimMeta(self, meta):
 		self.LoadAnimation(meta.file, meta.preScale, meta.preAngles)
 	
@@ -214,7 +215,7 @@ class AnimationObject(VRScript.Core.Behavior):
 	#		preAngle - degree to rotate this animation before showing
 	#		VRScript.Math.Vector preScale - scale this animation before showing
 	def LoadAnimation(self, file, preAngles=[0,0,0], preScale=VRScript.Math.Vector(1,1,1)):
-		print("load animation: " +file)
+		print("load animation: " +file + " for " + self.name)
 		
 		mat = VRScript.Math.Matrix()
 		mat.preScale(preScale)
@@ -225,10 +226,10 @@ class AnimationObject(VRScript.Core.Behavior):
 			if (a!=0):
 				mat.preAxisAngle(a, v[i])
 					
-		self.mesh = VRScript.Resources.Mesh(self.getName(), file, mat)
-		self.attach(VRScript.Core.Renderable(self.getName(), self.mesh))
+		self.mesh = VRScript.Resources.Mesh(self.name, file, mat)
+		self.attach(VRScript.Core.Renderable(self.name, self.mesh))
 		self.renderable('').show()
-		self.attach(VRScript.Core.Animable(self.getName(), self.mesh))
+		self.attach(VRScript.Core.Animable(self.name, self.mesh))
 	
 	# Move this animation to the given Matrix.
 	# Input:
@@ -246,3 +247,6 @@ class AnimationObject(VRScript.Core.Behavior):
 		
 	def Stop(self):
 		self.animable('').stop()
+
+	# def OnButtonRelease(self, btnInfo, intInfo):
+		# print("Animation clicked")
