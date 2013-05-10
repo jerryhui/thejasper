@@ -11,6 +11,7 @@ TASK LIST
 ## MUST DO
 - [ ] put in ghosts and monsters and stuff
 - [ ] doors (and others?) are slightly off
+- [ ] put in plates, chairs, etc
 
 ## NICE TO HAVE
 - [ ] turn on/off physics for doors?
@@ -25,6 +26,7 @@ DEV LOG
 =======
 ## 2013/05/10
 - [x] *Paranormal* with FBX hacked
+- [x] multiple status text
 
 ## 2013/05/09
 - [x] Fixed PHYSICS: by HULL on CONCAVE

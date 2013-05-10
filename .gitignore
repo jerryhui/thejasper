@@ -1,6 +1,6 @@
-Models\*
-AudioFiles\ligeti-*.wav
-Animations\*
+Models/*
+AudioFiles/ligeti-*.wav
+Animations/*
 *.fbx
 *.pyc
 !README.txt

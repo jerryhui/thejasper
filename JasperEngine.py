@@ -67,11 +67,14 @@ class EnvObject(VRScript.Core.Behavior):
 	#	n - Number of caught paranormals
 	def SetCaptured(self, n):
 		self.paranormalCaptured = n
+		prevText = 'You have caught {0} out of {1} ghosts'.format(self.paranormalCaptured-1,self.paranormalTotal)
+		if (prevText in self.textToShow):
+			self.textToShow.remove(prevText)
 		if (n < self.paranormalTotal):
 			self.textToShow.extend(['You have caught {0} out of {1} ghosts'.format(self.paranormalCaptured,self.paranormalTotal)])
 			# self.scoreText.setText('You have caught {0} out of {1} ghosts'.format(self.paranormalCaptured,self.paranormalTotal))
 		else:
-			self.textToShow.extend(['Congratulations! You have caught all {0} ghosts'.format(self.paranormalTotal)])
+			self.textToShow.extend(['Congratulations! You have caught all {0} ghosts'.format(self.paranormalTotal),"Come visit again","The Jasper: a project at WID","music: 'Lux Aeterna' by Gyorgy Ligeti"])
 			# self.scoreText.setText('Congratulations! You have caught all {0} ghosts'.format(self.paranormalTotal))
 	
 	# Add background music.
